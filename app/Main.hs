@@ -5,73 +5,63 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import Snake
 
+-- screen dimensions are float to reduce number of type casts in computation
+gameWidth :: Float 
+gameWidth = 640
+
+gameHeight :: Float
+gameHeight = 480
+
 window :: Display
-window = InWindow "Haskell Snake Game" (640, 480) (100, 100)
+window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) (100, 100)
 
 background :: Color
-background = orange
+background = white
 
+--useful shorthand
+toFloat (x, y) = (fromIntegral x, fromIntegral y)
+
+
+--fills up the cell at the input coordinates with the input color
+fillCell :: Position -> Color -> Picture 
+fillCell (posX, posY) col =
+  let 
+    centerRec = color col (rectangleSolid  cellSize cellSize)
+    topLeftRec = translate (-gameWidth/2  + cellSize/2) 
+                           (-gameHeight/2 + cellSize/2) 
+                           centerRec 
+  in
+    translate ( (fromIntegral posX) * cellSize ) ( (fromIntegral posY) * cellSize) topLeftRec
+
+
+
+--as of now : just display the user character + the current text input 
 render :: GameState -> Picture
 render gameState =
-  pictures $
-    [ fillRectangle black (16, 0) (640, 20),
-      fillRectangle black (16, 24) (640, 20),
-      fillRectangle black (0, 12) (20, 480),
-      fillRectangle black (32, 12) (20, 480)
-    ]
-      ++ fmap (convertToPicture black) [getCharacter gameState]
-      ++ gameOverPicture
-  where
-    convertToPicture :: Color -> (Int, Int) -> Picture
-    convertToPicture color' (x, y) = fillRectangle color' (toFloat (x, y)) (20, 20)
-    fillRectangle color' (tx, ty) (w, h) =
-      color color' $
-        scale 1 (-1) $
-          translate (tx * 20 - 320) (ty * 20 - 240) $
-            rectangleSolid w h
-    toFloat (x, y) = (fromIntegral x, fromIntegral y)
-    gameOverPicture =
-      if isGameOver gameState
-        then
-          [ color blue $
-              translate (-200) 0 $
-                scale 0.5 0.5 $
-                  text "GAME OVER",
-            color blue $
-              translate (-175) (-50) $
-                scale 0.2 0.2 $
-                  text "Press SPACE to try again."
-          ]
-        else []
+  let 
+    playerSprite = fillCell (getCharacter gameState) black
+
+    userText = scale 0.25 0.25 $  
+               translate (-gameWidth * 2) (-gameHeight * 2 + cellSize) (text $ getUserText gameState)
+  in
+    pictures $
+              playerSprite
+              : userText 
+              : []
+
+
+
 
 update :: Float -> GameState -> GameState
 update seconds gameState = gameState
-  -- if gameOver
-  --   then gameState
-  --   else GameState newSnake newFood' direction newGameOver newStdGen
-  -- where
-  --   snake = getSnake gameStateGameState
-  --   food = getFood gameState
-  --   direction = getDirection gameState
-  --   gameOver = isGameOver gameState
-  --   stdGen = getRandomStdGen gameState
-  --   (wasFoodEaten, newSnake) = move food direction snake
-  --   (newFood, newStdGen) = generateNewFood newSnake stdGen
-  --   newFood' =
-  --     if wasFoodEaten
-  --       then newFood
-  --       else food
-  --   newGameOver = checkGameOver newSnake
+
 
 handleKeys :: Event -> GameState -> GameState
 handleKeys (EventKey (SpecialKey KeyLeft) Down _ _) gameState = movedGameState gameState LEFT
 handleKeys (EventKey (SpecialKey KeyRight) Down _ _) gameState = movedGameState gameState RIGHT
 handleKeys (EventKey (SpecialKey KeyUp) Down _ _) gameState = movedGameState gameState UP
 handleKeys (EventKey (SpecialKey KeyDown) Down _ _) gameState = movedGameState gameState DOWN
-handleKeys (EventKey (SpecialKey KeySpace) Down _ _) gameState =
-  if isGameOver gameState
-    then initialGameState
-    else gameState
+
 handleKeys _ gameState = gameState
 
 main :: IO ()
