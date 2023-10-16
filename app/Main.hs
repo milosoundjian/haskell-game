@@ -19,6 +19,9 @@ window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) (100
 background :: Color
 background = yellow
 
+cursorFlickerDuration :: Int
+cursorFlickerDuration = 10
+
 -- useful shorthand
 toFloat :: (Integral a1, Integral a2, Num a3, Num b) => (a1, a2) -> (a3, b)
 toFloat (x, y) = (fromIntegral x, fromIntegral y)
@@ -59,8 +62,18 @@ render gameState =
 
 -- in pictures gameOverScreen
 
+
+-- currently : just increment the cursor timer =
 update :: Float -> GameState -> GameState
-update seconds gameState = gameState
+update seconds gameState = 
+  let 
+    curTimer = getCursorTimer . getCursorState $ gameState
+    newTimer = mod (curTimer + 1)  cursorFlickerDuration
+    
+  in
+    gameState {
+      getCursorState = getCursorState gameState 
+    }
 
 handleKeys :: Event -> GameState -> GameState
 -- handleKeys (EventKey (SpecialKey KeyLeft) Down _ _) gameState = movedGameState gameState LEFT
@@ -68,30 +81,56 @@ handleKeys :: Event -> GameState -> GameState
 -- handleKeys (EventKey (SpecialKey KeyUp) Down _ _) gameState = movedGameState gameState UP
 -- handleKeys (EventKey (SpecialKey KeyDown) Down _ _) gameState = movedGameState gameState DOWN
 
+
+
+
 -- player movement
 handleKeys (EventKey (SpecialKey key) Down _ _) gameState
   | key == KeyLeft = movedGameState gameState LEFT
   | key == KeyRight = movedGameState gameState RIGHT
   | key == KeyUp = movedGameState gameState UP
   | key == KeyDown = movedGameState gameState DOWN
+
+
+
+
 -- typing into user input
 handleKeys (EventKey (Char ch) Down _ _) gs =
-  GameState
-    { getCharacter = getCharacter gs,
-      getUserText = getUserText gs ++ [ch],
-      getRandomStdGen = getRandomStdGen gs
+  gs
+    { 
+      getUserText = getUserText gs ++ [ch]
     }
+
+handleKeys (EventKey (SpecialKey KeySpace) Down _ _) gs =
+  gs 
+  {
+    getUserText = getUserText gs ++ " "
+  }
+
+
+
 -- removing characters from user input
 handleKeys (EventKey (SpecialKey KeyDelete) Down _ _) gs =
   if not (null (getUserText gs))
     then
-      GameState
-        { getCharacter = getCharacter gs,
-          getUserText = init (getUserText gs),
-          getRandomStdGen = getRandomStdGen gs
+      gs
+        { 
+          getUserText = init (getUserText gs)
         }
     else gs
+
+--shortcut to clear the text input
+handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs = 
+  gs {
+    getUserText = ""
+  }
+  
+
 handleKeys _ gameState = gameState
+
+
+
+
 
 main :: IO ()
 main = play window background 10 initialGameState render handleKeys update
