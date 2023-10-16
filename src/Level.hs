@@ -1,7 +1,7 @@
 module Level where
 
 import Data.Tree
-import Snake
+import DataTypes
 
 type Obstacles = [Position]
 
