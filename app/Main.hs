@@ -49,7 +49,7 @@ render :: GameState -> Picture
 render gameState =
   let 
     --display the player
-    playerSprite = fillCell (getCharacter gameState) black
+    playerSprite = fillCell (character gameState) black
 
     --print the text and the cursor
     cursorSuffix = if (isCursorVisible . getCursorState $ gameState) 
@@ -132,9 +132,6 @@ handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs =
   
 
 handleKeys _ gameState = gameState
-
-
-
 
 
 main :: IO ()

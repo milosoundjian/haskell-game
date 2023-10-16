@@ -20,7 +20,7 @@ data CursorState = CursorState {
 }
 
 data GameState = GameState { 
-  getCharacter :: Character,
+  character :: Character,
   getUserText :: String,
   getRandomStdGen :: StdGen,
   
@@ -58,7 +58,7 @@ move (charX, charY) direction =
 -- same as move but takes and returns game state instead of char
 movedGameState :: GameState -> Direction -> GameState
 movedGameState gs dir =
-  gs {getCharacter = move (getCharacter gs) dir }
+  gs {character = move (character gs) dir }
 
 
 
@@ -66,7 +66,7 @@ initialGameState :: GameState
 initialGameState =
   GameState
     { 
-      getCharacter = (10, 10),
+      character = (10, 10),
       getUserText = "[Commands appear here]",
       getRandomStdGen = mkStdGen 100,
 
