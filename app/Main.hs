@@ -5,6 +5,7 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import Snake
 
+--  GAME CONSTANTS start here :
 -- screen dimensions are float to reduce number of type casts in computation
 gameWidth :: Float 
 gameWidth = 640
@@ -17,6 +18,7 @@ window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) (100
 
 background :: Color
 background = white
+
 
 --useful shorthand
 toFloat (x, y) = (fromIntegral x, fromIntegral y)
@@ -57,10 +59,41 @@ update seconds gameState = gameState
 
 
 handleKeys :: Event -> GameState -> GameState
-handleKeys (EventKey (SpecialKey KeyLeft) Down _ _) gameState = movedGameState gameState LEFT
-handleKeys (EventKey (SpecialKey KeyRight) Down _ _) gameState = movedGameState gameState RIGHT
-handleKeys (EventKey (SpecialKey KeyUp) Down _ _) gameState = movedGameState gameState UP
-handleKeys (EventKey (SpecialKey KeyDown) Down _ _) gameState = movedGameState gameState DOWN
+-- handleKeys (EventKey (SpecialKey KeyLeft) Down _ _) gameState = movedGameState gameState LEFT
+-- handleKeys (EventKey (SpecialKey KeyRight) Down _ _) gameState = movedGameState gameState RIGHT
+-- handleKeys (EventKey (SpecialKey KeyUp) Down _ _) gameState = movedGameState gameState UP
+-- handleKeys (EventKey (SpecialKey KeyDown) Down _ _) gameState = movedGameState gameState DOWN
+
+
+--player movement
+handleKeys (EventKey (SpecialKey key) Down _ _ ) gameState
+          | key == KeyLeft = movedGameState gameState LEFT
+          | key == KeyRight = movedGameState gameState RIGHT
+          | key == KeyUp = movedGameState gameState UP
+          | key == KeyDown = movedGameState gameState DOWN
+
+-- typing into user input
+handleKeys (EventKey (Char ch) Down _ _ ) gs =
+          GameState {
+            getCharacter = getCharacter gs,
+            getUserText = getUserText gs ++ [ch],
+            getRandomStdGen = getRandomStdGen gs
+          }
+
+-- removing characters from user input
+handleKeys (EventKey (SpecialKey KeyDelete) Down _ _) gs =
+          if (length (getUserText gs) > 0) then 
+            GameState {
+              getCharacter = getCharacter gs,
+              getUserText = init (getUserText gs),
+              getRandomStdGen = getRandomStdGen gs
+            }
+          else
+            gs 
+
+
+
+
 
 handleKeys _ gameState = gameState
 
