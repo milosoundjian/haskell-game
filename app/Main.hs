@@ -8,7 +8,7 @@ import Constants
 
 -- game window, 
 window :: Display
-window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) (100, 100)
+window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) (0, 0)
 
 
 

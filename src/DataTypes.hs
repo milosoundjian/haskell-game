@@ -13,6 +13,21 @@ type Position = (Int, Int)
 
 type Character = Position
 
+-- The most important data types in the entire project 
+data CursorState = CursorState {
+  isCursorVisible :: Bool,
+  getCursorTimer :: Int
+}
+
+data GameState = GameState { 
+  getCharacter :: Character,
+  getUserText :: String,
+  getRandomStdGen :: StdGen,
+  
+  getCursorState :: CursorState,
+  getLevelIndex :: Int
+}
+
 cols :: Int
 cols = 16
 
@@ -45,19 +60,7 @@ movedGameState :: GameState -> Direction -> GameState
 movedGameState gs dir =
   gs {getCharacter = move (getCharacter gs) dir }
 
-data CursorState = CursorState
-  {
-    isCursorVisible :: Bool,
-    getCursorTimer :: Int
-  }
 
-data GameState = GameState
-  { 
-    getCharacter :: Character,
-    getUserText :: String,
-    getRandomStdGen :: StdGen,
-    getCursorState :: CursorState
-  }
 
 initialGameState :: GameState
 initialGameState =
@@ -70,5 +73,6 @@ initialGameState =
       getCursorState = CursorState {
         isCursorVisible = True,
         getCursorTimer = 0
-      }
+      },
+      getLevelIndex = (-1)
     }
