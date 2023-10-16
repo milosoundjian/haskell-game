@@ -38,6 +38,7 @@ library:
   dependencies:
   - containers
   - random
+  - gloss
 
 executables:
   haskell-game-exe:
