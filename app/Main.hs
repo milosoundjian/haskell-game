@@ -9,7 +9,7 @@ window :: Display
 window = InWindow "Haskell Snake Game" (640, 480) (100, 100)
 
 background :: Color
-background = white
+background = orange
 
 render :: GameState -> Picture
 render gameState =
@@ -19,12 +19,9 @@ render gameState =
       fillRectangle black (0, 12) (20, 480),
       fillRectangle black (32, 12) (20, 480)
     ]
-      ++ fmap (convertToPicture black) snake
-      ++ fmap (convertToPicture blue) [food]
+      ++ fmap (convertToPicture black) [getCharacter gameState]
       ++ gameOverPicture
   where
-    snake = getSnake gameState
-    food = getFood gameState
     convertToPicture :: Color -> (Int, Int) -> Picture
     convertToPicture color' (x, y) = fillRectangle color' (toFloat (x, y)) (20, 20)
     fillRectangle color' (tx, ty) (w, h) =
@@ -48,34 +45,34 @@ render gameState =
         else []
 
 update :: Float -> GameState -> GameState
-update seconds gameState =
-  if gameOver
-    then gameState
-    else GameState newSnake newFood' direction newGameOver newStdGen
-  where
-    snake = getSnake gameState
-    food = getFood gameState
-    direction = getDirection gameState
-    gameOver = isGameOver gameState
-    stdGen = getRandomStdGen gameState
-    (wasFoodEaten, newSnake) = move food direction snake
-    (newFood, newStdGen) = generateNewFood newSnake stdGen
-    newFood' =
-      if wasFoodEaten
-        then newFood
-        else food
-    newGameOver = checkGameOver newSnake
+update seconds gameState = gameState
+  -- if gameOver
+  --   then gameState
+  --   else GameState newSnake newFood' direction newGameOver newStdGen
+  -- where
+  --   snake = getSnake gameStateGameState
+  --   food = getFood gameState
+  --   direction = getDirection gameState
+  --   gameOver = isGameOver gameState
+  --   stdGen = getRandomStdGen gameState
+  --   (wasFoodEaten, newSnake) = move food direction snake
+  --   (newFood, newStdGen) = generateNewFood newSnake stdGen
+  --   newFood' =
+  --     if wasFoodEaten
+  --       then newFood
+  --       else food
+  --   newGameOver = checkGameOver newSnake
 
 handleKeys :: Event -> GameState -> GameState
-handleKeys (EventKey (SpecialKey KeyLeft) Down _ _) gameState = changeDirection gameState LEFT
-handleKeys (EventKey (SpecialKey KeyRight) Down _ _) gameState = changeDirection gameState RIGHT
-handleKeys (EventKey (SpecialKey KeyUp) Down _ _) gameState = changeDirection gameState UP
-handleKeys (EventKey (SpecialKey KeyDown) Down _ _) gameState = changeDirection gameState DOWN
+handleKeys (EventKey (SpecialKey KeyLeft) Down _ _) gameState = movedGameState gameState LEFT
+handleKeys (EventKey (SpecialKey KeyRight) Down _ _) gameState = movedGameState gameState RIGHT
+handleKeys (EventKey (SpecialKey KeyUp) Down _ _) gameState = movedGameState gameState UP
+handleKeys (EventKey (SpecialKey KeyDown) Down _ _) gameState = movedGameState gameState DOWN
 handleKeys (EventKey (SpecialKey KeySpace) Down _ _) gameState =
   if isGameOver gameState
-    then initialGameState False
+    then initialGameState
     else gameState
 handleKeys _ gameState = gameState
 
 main :: IO ()
-main = play window background 10 (initialGameState True) render handleKeys update
+main = play window background 10 (initialGameState) render handleKeys update
