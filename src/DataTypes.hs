@@ -1,4 +1,4 @@
-module Snake where
+module DataTypes where
 
 import Data.Map as Map
 import System.Random
@@ -43,11 +43,7 @@ move (charX, charY) direction =
 -- same as move but takes and returns game state instead of char
 movedGameState :: GameState -> Direction -> GameState
 movedGameState gs dir =
-  GameState
-    { getCharacter = move (getCharacter gs) dir,
-      getUserText = getUserText gs,
-      getRandomStdGen = (getRandomStdGen gs)
-    }
+  gs {getCharacter = move (getCharacter gs) dir }
 
 data CursorState = CursorState
   {

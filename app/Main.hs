@@ -3,7 +3,7 @@ module Main where
 import Debug.Trace
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
-import Snake
+import DataTypes
 import Constants
 
 -- game window, 
