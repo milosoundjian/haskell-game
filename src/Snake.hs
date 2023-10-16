@@ -49,16 +49,30 @@ movedGameState gs dir =
       getRandomStdGen = (getRandomStdGen gs)
     }
 
+data CursorState = CursorState
+  {
+    isCursorVisible :: Bool,
+    getCursorTimer :: Int
+  }
+
 data GameState = GameState
-  { getCharacter :: Character,
+  { 
+    getCharacter :: Character,
     getUserText :: String,
-    getRandomStdGen :: StdGen
+    getRandomStdGen :: StdGen,
+    getCursorState :: CursorState
   }
 
 initialGameState :: GameState
 initialGameState =
   GameState
-    { getCharacter = (10, 10),
+    { 
+      getCharacter = (10, 10),
       getUserText = "[Commands appear here]",
-      getRandomStdGen = mkStdGen 100
+      getRandomStdGen = mkStdGen 100,
+
+      getCursorState = CursorState {
+        isCursorVisible = True,
+        getCursorTimer = 0
+      }
     }
