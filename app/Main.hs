@@ -45,8 +45,8 @@ gameOverScreen = [bg, txt]
     txt = color red $ translate (-gameWidth / 2 + 150) 0 $ scale 0.5 0.5 (Text "YOU DIED")
 
 -- as of now : just display the user character + the current text input
-render :: GameState -> Picture
-render gameState =
+render :: [Picture] -> GameState  -> Picture
+render sprites gameState =
   let 
     --display the player
     playerSprite = fillCell (character gameState) black
@@ -61,7 +61,7 @@ render gameState =
         translate (-gameWidth / 2 + cellSize / 2) (-gameHeight / 2 + cellSize / 2) $
           scale 0.25 0.25 (text textContent)
    in 
-    pictures ([playerSprite, displayText] ++ grid)
+    pictures ([playerSprite, displayText] ++ grid ++ sprites)
 
 -- in pictures gameOverScreen
 
@@ -129,4 +129,7 @@ handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs =
 handleKeys _ gameState = gameState
 
 main :: IO ()
-main = play window background 10 initialGameState render handleKeys update
+main = do
+  grass <- loadBMP "assets/grass.bmp"
+  play window background 10 initialGameState (render [grass]) handleKeys update
+  -- play window background 10 initialGameState render handleKeys  update

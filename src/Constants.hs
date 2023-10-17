@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Constants where 
 
 import Graphics.Gloss
@@ -15,6 +16,6 @@ background :: Color
 background = yellow
 
 cursorFlickerDuration :: Int
-cursorFlickerDuration = 3
+cursorFlickerDuration = 5
 cursorCharacter :: String
 cursorCharacter = "|"
