@@ -2,6 +2,7 @@
 module Constants where 
 
 import Graphics.Gloss
+import GHC.Float (float2Int)
 
 
 --  GAME CONSTANTS start here :
@@ -11,6 +12,15 @@ gameWidth = 640
 
 gameHeight :: Float
 gameHeight = 480
+
+cellSize :: Float
+cellSize = 32
+
+cols :: Int
+cols = float2Int(gameWidth / cellSize)
+
+rows :: Int
+rows = float2Int(gameHeight / cellSize)
 
 background :: Color
 background = yellow
