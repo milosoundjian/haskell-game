@@ -131,5 +131,6 @@ handleKeys _ gameState = gameState
 main :: IO ()
 main = do
   grass <- loadBMP "assets/grass.bmp"
-  play window background 10 initialGameState (render [grass]) handleKeys update
+  squirrel <- loadBMP "assets/squirrel.bmp"
+  play window background 10 initialGameState (render [grass, squirrel]) handleKeys update
   -- play window background 10 initialGameState render handleKeys  update
