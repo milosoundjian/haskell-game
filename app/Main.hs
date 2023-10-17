@@ -98,7 +98,7 @@ handleKeys (EventKey (SpecialKey key) Down _ _) gameState
   | key == KeyDown = movedGameState gameState DOWN
 
 
-
+  -- rest of the code
 
 -- typing into user input
 handleKeys (EventKey (Char ch) Down _ _) gs =
@@ -115,14 +115,9 @@ handleKeys (EventKey (SpecialKey KeySpace) Down _ _) gs =
 
 
 -- removing characters from user input
-handleKeys (EventKey (SpecialKey KeyDelete) Down _ _) gs =
-  if not (null (getUserText gs))
-    then
-      gs
-        { 
-          getUserText = init (getUserText gs)
-        }
-    else gs
+handleKeys (EventKey (SpecialKey KeyDelete) Down _ _) gs
+  | [] <- getUserText gs = gs
+  | otherwise = gs { getUserText = init (getUserText gs) }
 
 --shortcut to clear the text input
 handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs = 
@@ -132,7 +127,6 @@ handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs =
   
 
 handleKeys _ gameState = gameState
-
 
 main :: IO ()
 main = play window background 10 initialGameState render handleKeys update
