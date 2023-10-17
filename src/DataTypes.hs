@@ -2,6 +2,7 @@ module DataTypes where
 
 import Data.Map as Map
 import System.Random
+import Constants
 
 data Direction = UP | DOWN | LEFT | RIGHT deriving (Eq, Ord)
 
@@ -27,15 +28,6 @@ data GameState = GameState {
   cursorState :: CursorState,
   levelIndex :: Int
 }
-
-cols :: Int
-cols = 16
-
-rows :: Int
-rows = 12
-
-cellSize :: Float
-cellSize = 40
 
 directionVectorMap :: Map Direction (Int, Int)
 directionVectorMap =
