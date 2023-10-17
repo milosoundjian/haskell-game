@@ -52,16 +52,16 @@ render gameState =
     playerSprite = fillCell (character gameState) black
 
     --print the text and the cursor
-    cursorSuffix = if (isCursorVisible . getCursorState $ gameState) 
+    cursorSuffix = if (isCursorVisible . cursorState $ gameState) 
                    then cursorCharacter else ""
 
-    textContent = getUserText gameState ++ cursorSuffix 
-    userText =
+    textContent = userText gameState ++ cursorSuffix 
+    displayText =
       color red $
         translate (-gameWidth / 2 + cellSize / 2) (-gameHeight / 2 + cellSize / 2) $
           scale 0.25 0.25 (text textContent)
    in 
-    pictures ([playerSprite, userText] ++ grid)
+    pictures ([playerSprite, displayText] ++ grid)
 
 -- in pictures gameOverScreen
 
@@ -70,17 +70,17 @@ render gameState =
 update :: Float -> GameState -> GameState
 update seconds gameState = 
   let 
-    curTimer = getCursorTimer . getCursorState $ gameState
+    curTimer = cursorTimer . cursorState $ gameState
     newTimer = mod (curTimer + 1)  cursorFlickerDuration
 
-    curOpacity = isCursorVisible . getCursorState $ gameState
+    curOpacity = isCursorVisible . cursorState $ gameState
     newOpacity = curOpacity /= (newTimer == 0) 
     
   in
     gameState {
-      getCursorState = (getCursorState gameState) {
+      cursorState = (cursorState gameState) {
         isCursorVisible = newOpacity, 
-        getCursorTimer = newTimer
+        cursorTimer = newTimer
       } 
     }
 
@@ -104,25 +104,25 @@ handleKeys (EventKey (SpecialKey key) Down _ _) gameState
 handleKeys (EventKey (Char ch) Down _ _) gs =
   gs
     { 
-      getUserText = getUserText gs ++ [ch]
+      userText = userText gs ++ [ch]
     }
 
 handleKeys (EventKey (SpecialKey KeySpace) Down _ _) gs =
   gs 
   {
-    getUserText = getUserText gs ++ " "
+    userText = userText gs ++ " "
   }
 
 
 -- removing characters from user input
 handleKeys (EventKey (SpecialKey KeyDelete) Down _ _) gs
-  | [] <- getUserText gs = gs
-  | otherwise = gs { getUserText = init (getUserText gs) }
+  | [] <- userText gs = gs
+  | otherwise = gs { userText = init (userText gs) }
 
 --shortcut to clear the text input
 handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs = 
   gs {
-    getUserText = ""
+    userText = ""
   }
   
 

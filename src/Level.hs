@@ -9,11 +9,11 @@ type Spikes = [Position]
 
 data Room = Room
     {
-        getSpikes :: Spikes,
-        getObstacles :: Obstacles,
+        spikes :: Spikes,
+        obstacles :: Obstacles,
         isTerminal :: Bool,
         getSpecialPos :: Position, 
-        getInitialCharacterPos :: Position
+        initialCharacterPos :: Position
     }
 
 type Level = Tree Room

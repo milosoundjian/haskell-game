@@ -16,16 +16,16 @@ type Character = Position
 -- The most important data types in the entire project 
 data CursorState = CursorState {
   isCursorVisible :: Bool,
-  getCursorTimer :: Int
+  cursorTimer :: Int
 }
 
 data GameState = GameState { 
   character :: Character,
-  getUserText :: String,
-  getRandomStdGen :: StdGen,
+  userText :: String,
+  randomStdGen :: StdGen,
   
-  getCursorState :: CursorState,
-  getLevelIndex :: Int
+  cursorState :: CursorState,
+  levelIndex :: Int
 }
 
 cols :: Int
@@ -67,12 +67,12 @@ initialGameState =
   GameState
     { 
       character = (10, 10),
-      getUserText = "[Commands appear here]",
-      getRandomStdGen = mkStdGen 100,
+      userText = "[Commands appear here]",
+      randomStdGen = mkStdGen 100,
 
-      getCursorState = CursorState {
+      cursorState = CursorState {
         isCursorVisible = True,
-        getCursorTimer = 0
+        cursorTimer = 0
       },
-      getLevelIndex = (-1)
+      levelIndex = (-1)
     }
