@@ -13,6 +13,9 @@ gameWidth = 640
 gameHeight :: Float
 gameHeight = 480
 
+framerate :: Int
+framerate = 20
+
 cellSize :: Float
 cellSize = 32
 

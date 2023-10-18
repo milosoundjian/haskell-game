@@ -15,18 +15,17 @@ type Position = (Int, Int)
 
 type Character = Position
 
--- The most important data types in the entire project 
-data CursorState = CursorState {
-  isCursorVisible :: Bool,
-  cursorTimer :: Int
-}
 
+-- data type that encodes every value susceptible of changing over time
 data GameState = GameState { 
   character :: Character,
   userText :: String,
+  elapsedFrames :: Int,
+
   randomStdGen :: StdGen,
   
-  cursorState :: CursorState,
+  isCursorVisible :: Bool,
+
   levelIndex :: Int
 }
 
@@ -61,11 +60,11 @@ initialGameState =
     { 
       character = (10, 10),
       userText = "[Commands appear here]",
+      elapsedFrames = 0,
+
       randomStdGen = mkStdGen 100,
 
-      cursorState = CursorState {
-        isCursorVisible = True,
-        cursorTimer = 0
-      },
+      isCursorVisible = True,
+      
       levelIndex = (-1)
     }

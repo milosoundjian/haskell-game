@@ -44,7 +44,7 @@ gameOverScreen = [bg, txt]
     bg = color black $ rectangleSolid gameWidth gameHeight
     txt = color red $ translate (-gameWidth / 2 + 150) 0 $ scale 0.5 0.5 (Text "YOU DIED")
 
--- as of now : just display the user character + the current text input
+-- display the user character + the current text input
 render :: [Picture] -> GameState  -> Picture
 render sprites gameState =
   let 
@@ -52,7 +52,7 @@ render sprites gameState =
     playerSprite = fillCell (character gameState) black
 
     --print the text and the cursor
-    cursorSuffix = if (isCursorVisible . cursorState $ gameState) 
+    cursorSuffix = if (isCursorVisible gameState) 
                    then cursorCharacter else ""
 
     textContent = userText gameState ++ cursorSuffix 
@@ -66,24 +66,20 @@ render sprites gameState =
 -- in pictures gameOverScreen
 
 
--- currently : just increment the cursor timer =
+
 update :: Float -> GameState -> GameState
 update seconds gameState = 
   let 
-    curTimer = cursorTimer . cursorState $ gameState
-    newTimer = mod (curTimer + 1)  cursorFlickerDuration
+    --increment the timer value
+    newElapsed = (elapsedFrames gameState) + 1
+    newVisibility = not (isCursorVisible gameState)
 
-    curOpacity = isCursorVisible . cursorState $ gameState
-    newOpacity = curOpacity /= (newTimer == 0) 
-    
   in
-    gameState {
-      cursorState = (cursorState gameState) {
-        isCursorVisible = newOpacity, 
-        cursorTimer = newTimer
-      } 
-    }
-
+    --handle all timer related utilities
+    if (mod newElapsed cursorFlickerDuration == 0) then 
+      gameState {elapsedFrames = newElapsed, isCursorVisible = newVisibility}
+    else
+      gameState {elapsedFrames = newElapsed}
 
 
 
@@ -132,5 +128,5 @@ main :: IO ()
 main = do
   grass <- loadBMP "assets/grass.bmp"
   squirrel <- loadBMP "assets/squirrel.bmp"
-  play window background 10 initialGameState (render [grass, squirrel]) handleKeys update
+  play window background framerate initialGameState (render [grass, squirrel]) handleKeys update
   -- play window background 10 initialGameState render handleKeys  update
