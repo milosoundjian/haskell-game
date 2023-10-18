@@ -8,7 +8,6 @@ import DataTypes
 
 type Boxes = [Position]
 
-type Spikes = [Position]
 
 type Water = [Position]
 
