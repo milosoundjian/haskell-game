@@ -9,7 +9,7 @@ import Graphics.Gloss.Interface.Environment
 --internal imports
 import DataTypes
 import Constants
-import Level
+import Levels
 
 
 

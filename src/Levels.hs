@@ -1,8 +1,12 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Levels where
 
-import Data.Tree
+import qualified Data.Map as Mapping
+import System.Random
+
+import Constants
 import DataTypes
+
 
 
 --Helper FUNCTIONS
@@ -38,7 +42,7 @@ initialGameState =
       elapsedFrames = 0,
       levelIndex = -1,
 
-      rooms = [DebugRoom],
+      rooms = [debugRoom],
       moveHistory = []
     }
 

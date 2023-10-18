@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module DataTypes where
 
+import Data.Tree
 import qualified Data.Map as Mapping
 import System.Random
 
@@ -32,7 +33,7 @@ data RoomState = RoomState
   }
 
 
-type Level = Tree Room
+type Level = Tree RoomState
 
 data GameState = GameState {
   -- ui related stuff
