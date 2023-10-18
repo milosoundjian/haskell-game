@@ -123,6 +123,16 @@ handleKeys (EventKey (SpecialKey key) Down _ _) gameState
   | key == KeyDown = movedGameState gameState DOWN
 
 
+-- removing characters from user input
+handleKeys (EventKey (SpecialKey KeyDelete) Down _ _) gs
+  | [] <- userText gs = gs
+  | otherwise = gs { userText = init (userText gs) }
+
+handleKeys (EventKey (Char '\b') Down _ _) gs
+  | [] <- userText gs = gs
+  | otherwise = gs { userText = init (userText gs) }
+
+
 -- typing into user input
 handleKeys (EventKey (Char ch) Down _ _) gs =
   gs
@@ -137,10 +147,7 @@ handleKeys (EventKey (SpecialKey KeySpace) Down _ _) gs =
   }
 
 
--- removing characters from user input
-handleKeys (EventKey (SpecialKey KeyDelete) Down _ _) gs
-  | [] <- userText gs = gs
-  | otherwise = gs { userText = init (userText gs) }
+
 
 --shortcut to clear the text input
 handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs = 
@@ -149,7 +156,7 @@ handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs =
   }
 
 handleKeys (EventKey (SpecialKey KeyEnter) Down _ _) gs = 
-  (interpret (userText gs) gs) {userText = ""}
+  (interpret (userText gs) gs) --{userText = ""}
   
 
 handleKeys _ gameState = gameState
