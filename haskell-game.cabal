@@ -28,6 +28,7 @@ library
       Constants
       DataTypes
       Levels
+      Interpreter
   other-modules:
       Paths_haskell_game
   autogen-modules:

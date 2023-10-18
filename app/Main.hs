@@ -10,6 +10,7 @@ import Graphics.Gloss.Interface.Environment
 import DataTypes
 import Constants
 import Levels
+import Interpreter
 
 
 
@@ -100,7 +101,7 @@ update :: Float -> GameState -> GameState
 update seconds gameState = 
   let 
     --increment the timer value
-    newElapsed = (elapsedFrames gameState) + 1
+    newElapsed = elapsedFrames gameState + 1
     newVisibility = not (isCursorVisible gameState)
 
   in
@@ -146,6 +147,9 @@ handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs =
   gs {
     userText = ""
   }
+
+handleKeys (EventKey (SpecialKey KeyEnter) Down _ _) gs = 
+  (interpret (userText gs) gs) {userText = ""}
   
 
 handleKeys _ gameState = gameState
