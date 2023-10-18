@@ -43,13 +43,29 @@ gameOverScreen = [bg, txt]
     bg = color black $ rectangleSolid gameWidth gameHeight
     txt = color red $ translate (-gameWidth / 2 + 150) 0 $ scale 0.5 0.5 (Text "YOU DIED")
 
+outOfBoundsScreen :: [Picture]
+outOfBoundsScreen = [bg, txt] 
+  where 
+    bg = color black $ rectangleSolid gameWidth gameHeight
+    txt = color red $ translate (-gameWidth / 2 + 150) 0 $ scale 0.5 0.5 (Text "OUT OF BOUNDS")
+
+
 -- display the user character + the current text input
+renderRoom :: [Picture] -> RoomState -> Picture
+renderRoom sprites roomState = 
+  let 
+    --display the player
+    playerSprite = fillCell (character roomState) black
+
+  in
+    -- combine everything
+    pictures ([playerSprite] ++ grid ++ sprites)
+
+
+-- display each game room at the proper position
 render :: [Picture] -> GameState  -> Picture
 render sprites gameState =
   let 
-    --display the player
-    playerSprite = fillCell (character gameState) black
-
     --print the text and the cursor
     cursorSuffix = if (isCursorVisible gameState) 
                    then cursorCharacter else ""
@@ -58,11 +74,21 @@ render sprites gameState =
     displayText =
       color red $
         translate (-gameWidth / 2 + cellSize / 2) (-gameHeight / 2 + cellSize / 2) $
-          scale 0.25 0.25 (text textContent)
-   in 
-    pictures ([playerSprite, displayText] ++ grid ++ sprites)
+          scale 0.25 0.25 (text textContent) :: Picture
 
--- in pictures gameOverScreen
+    --render only the rooms we need thanks to lazy eval
+    firstRoom = renderRoom sprites (rooms gameState !! 0)
+    secondRoom = renderRoom sprites (rooms gameState !! 1)
+    thirdRoom = renderRoom sprites (rooms gameState !! 2)
+    fourthRoom = renderRoom sprites (rooms gameState !! 3)
+
+   in 
+    case (length . rooms $ gameState) of 
+      0 -> pictures outOfBoundsScreen
+      1 -> pictures [firstRoom, displayText]
+      2 -> undefined
+      3 -> undefined
+      4 -> undefined 
 
 
 
@@ -84,7 +110,6 @@ update seconds gameState =
 
 handleKeys :: Event -> GameState -> GameState
 
-
 -- player movement
 handleKeys (EventKey (SpecialKey key) Down _ _) gameState
   | key == KeyLeft = movedGameState gameState LEFT
@@ -92,8 +117,6 @@ handleKeys (EventKey (SpecialKey key) Down _ _) gameState
   | key == KeyUp = movedGameState gameState UP
   | key == KeyDown = movedGameState gameState DOWN
 
-
-  -- rest of the code
 
 -- typing into user input
 handleKeys (EventKey (Char ch) Down _ _) gs =
