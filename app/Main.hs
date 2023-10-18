@@ -1,14 +1,18 @@
 module Main (main) where
 
+--external imports
 import Debug.Trace
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
+import Graphics.Gloss.Interface.Environment
+
+--internal imports
 import DataTypes
 import Constants
+import Levels
+import Interpreter
 
--- game window, 
-window :: Display
-window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) (0, 0)
+
 
 
 
@@ -44,51 +48,72 @@ gameOverScreen = [bg, txt]
     bg = color black $ rectangleSolid gameWidth gameHeight
     txt = color red $ translate (-gameWidth / 2 + 150) 0 $ scale 0.5 0.5 (Text "YOU DIED")
 
--- as of now : just display the user character + the current text input
-render :: [Picture] -> GameState  -> Picture
-render sprites gameState =
+outOfBoundsScreen :: [Picture]
+outOfBoundsScreen = [bg, txt] 
+  where 
+    bg = color black $ rectangleSolid gameWidth gameHeight
+    txt = color red $ translate (-gameWidth / 2 + 150) 0 $ scale 0.5 0.5 (Text "OUT OF BOUNDS")
+
+
+-- display the user character + the current text input
+renderRoom :: [Sprite] -> RoomState -> Picture
+renderRoom sprites roomState = 
   let 
     --display the player
-    playerSprite = fillCell (character gameState) black
+    playerSprite = fillCell (character roomState) black
 
+  in
+    -- combine everything
+    pictures ([playerSprite] ++ grid ++ (map picture sprites))
+
+
+-- display each game room at the proper position
+render :: [Sprite] -> GameState  -> Picture
+render sprites gameState =
+  let 
     --print the text and the cursor
-    cursorSuffix = if (isCursorVisible . cursorState $ gameState) 
+    cursorSuffix = if (isCursorVisible gameState) 
                    then cursorCharacter else ""
 
     textContent = userText gameState ++ cursorSuffix 
     displayText =
       color red $
         translate (-gameWidth / 2 + cellSize / 2) (-gameHeight / 2 + cellSize / 2) $
-          scale 0.25 0.25 (text textContent)
+          scale 0.25 0.25 (text textContent) :: Picture
+
+    --render only the rooms we need thanks to lazy eval
+    firstRoom = renderRoom sprites (rooms gameState !! 0)
+    secondRoom = renderRoom sprites (rooms gameState !! 1)
+    thirdRoom = renderRoom sprites (rooms gameState !! 2)
+    fourthRoom = renderRoom sprites (rooms gameState !! 3)
+
    in 
-    pictures ([playerSprite, displayText] ++ grid ++ sprites)
+    case (length . rooms $ gameState) of 
+      0 -> pictures outOfBoundsScreen
+      1 -> pictures [firstRoom, displayText]
+      2 -> undefined
+      3 -> undefined
+      4 -> undefined 
 
--- in pictures gameOverScreen
 
 
--- currently : just increment the cursor timer =
 update :: Float -> GameState -> GameState
 update seconds gameState = 
   let 
-    curTimer = cursorTimer . cursorState $ gameState
-    newTimer = mod (curTimer + 1)  cursorFlickerDuration
+    --increment the timer value
+    newElapsed = elapsedFrames gameState + 1
+    newVisibility = not (isCursorVisible gameState)
 
-    curOpacity = isCursorVisible . cursorState $ gameState
-    newOpacity = curOpacity /= (newTimer == 0) 
-    
   in
-    gameState {
-      cursorState = (cursorState gameState) {
-        isCursorVisible = newOpacity, 
-        cursorTimer = newTimer
-      } 
-    }
-
+    --handle all timer related utilities
+    if (mod newElapsed cursorFlickerDuration == 0) then 
+      gameState {elapsedFrames = newElapsed, isCursorVisible = newVisibility}
+    else
+      gameState {elapsedFrames = newElapsed}
 
 
 
 handleKeys :: Event -> GameState -> GameState
-
 
 -- player movement
 handleKeys (EventKey (SpecialKey key) Down _ _) gameState
@@ -98,7 +123,15 @@ handleKeys (EventKey (SpecialKey key) Down _ _) gameState
   | key == KeyDown = movedGameState gameState DOWN
 
 
-  -- rest of the code
+-- removing characters from user input
+handleKeys (EventKey (SpecialKey KeyDelete) Down _ _) gs
+  | [] <- userText gs = gs
+  | otherwise = gs { userText = init (userText gs) }
+
+handleKeys (EventKey (Char '\b') Down _ _) gs
+  | [] <- userText gs = gs
+  | otherwise = gs { userText = init (userText gs) }
+
 
 -- typing into user input
 handleKeys (EventKey (Char ch) Down _ _) gs =
@@ -114,23 +147,38 @@ handleKeys (EventKey (SpecialKey KeySpace) Down _ _) gs =
   }
 
 
--- removing characters from user input
-handleKeys (EventKey (SpecialKey KeyDelete) Down _ _) gs
-  | [] <- userText gs = gs
-  | otherwise = gs { userText = init (userText gs) }
+
 
 --shortcut to clear the text input
 handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs = 
   gs {
     userText = ""
   }
+
+handleKeys (EventKey (SpecialKey KeyEnter) Down _ _) gs = 
+  (interpret (userText gs) gs) --{userText = ""}
   
 
 handleKeys _ gameState = gameState
 
 main :: IO ()
 main = do
+  -- load the assets for the render function
   grass <- loadBMP "assets/grass.bmp"
   squirrel <- loadBMP "assets/squirrel.bmp"
-  play window background 10 initialGameState (render [grass, squirrel]) handleKeys update
-  -- play window background 10 initialGameState render handleKeys  update
+  
+  --TODO : complete this pls ! 
+  let sprites = Sprite { picture = grass, dimensions = (32, 32) }:
+                Sprite { picture = squirrel, dimensions = (32, 32) }:
+                []
+  
+
+  --place the game window in the center of the screen
+  screenSize <- getScreenSize 
+
+  let xCentered = (fromIntegral (fst screenSize) - gameWidth) / 2.0
+  let yCentered = (fromIntegral (snd screenSize) - gameHeight) / 2.0 
+  let window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) 
+               (round xCentered, round yCentered)
+
+  play window background framerate initialGameState (render sprites) handleKeys update

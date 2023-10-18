@@ -22,3 +22,4 @@ data Room = Room
   }
 
 type Level = Tree Room
+

@@ -27,7 +27,8 @@ library
   exposed-modules:
       Constants
       DataTypes
-      Level
+      Levels
+      Interpreter
   other-modules:
       Paths_haskell_game
   autogen-modules:
