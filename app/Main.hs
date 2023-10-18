@@ -3,12 +3,11 @@ module Main (main) where
 import Debug.Trace
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
+import Graphics.Gloss.Interface.Environment
 import DataTypes
 import Constants
 
--- game window, 
-window :: Display
-window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) (0, 0)
+
 
 
 
@@ -126,7 +125,17 @@ handleKeys _ gameState = gameState
 
 main :: IO ()
 main = do
+  -- load the assets for the render function
   grass <- loadBMP "assets/grass.bmp"
   squirrel <- loadBMP "assets/squirrel.bmp"
-  play window background framerate initialGameState (render [grass, squirrel]) handleKeys update
-  -- play window background 10 initialGameState render handleKeys  update
+  let sprites = [grass, squirrel]
+
+  --place the game window in the center of the screen
+  screenSize <- getScreenSize 
+
+  let xCentered = (fromIntegral (fst screenSize) - gameWidth) / 2.0
+  let yCentered = (fromIntegral (snd screenSize) - gameHeight) / 2.0 
+  let window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) 
+               (round xCentered, round yCentered)
+
+  play window background framerate initialGameState (render sprites) handleKeys update
