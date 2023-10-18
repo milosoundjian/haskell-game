@@ -2,28 +2,29 @@
 module Constants where 
 
 import Graphics.Gloss
-import GHC.Float (float2Int)
 
 
 --  GAME CONSTANTS start here :
 -- screen dimensions are float to reduce number of type casts in computation
-gameWidth :: Float
-gameWidth = 640
+rows :: Int
+rows = 15
 
-gameHeight :: Float
-gameHeight = 480
-
-framerate :: Int
-framerate = 20
+cols :: Int
+cols = 20
 
 cellSize :: Float
 cellSize = 32
 
-cols :: Int
-cols = float2Int(gameWidth / cellSize)
 
-rows :: Int
-rows = float2Int(gameHeight / cellSize)
+gameWidth :: Float
+gameWidth = fromIntegral cols * cellSize
+
+gameHeight :: Float
+gameHeight = fromIntegral rows * cellSize
+
+framerate :: Int
+framerate = 20
+
 
 background :: Color
 background = yellow
