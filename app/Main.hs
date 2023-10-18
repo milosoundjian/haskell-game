@@ -55,7 +55,7 @@ outOfBoundsScreen = [bg, txt]
 
 
 -- display the user character + the current text input
-renderRoom :: [Picture] -> RoomState -> Picture
+renderRoom :: [Sprite] -> RoomState -> Picture
 renderRoom sprites roomState = 
   let 
     --display the player
@@ -63,11 +63,11 @@ renderRoom sprites roomState =
 
   in
     -- combine everything
-    pictures ([playerSprite] ++ grid ++ sprites)
+    pictures ([playerSprite] ++ grid ++ (map picture sprites))
 
 
 -- display each game room at the proper position
-render :: [Picture] -> GameState  -> Picture
+render :: [Sprite] -> GameState  -> Picture
 render sprites gameState =
   let 
     --print the text and the cursor
@@ -155,7 +155,12 @@ main = do
   -- load the assets for the render function
   grass <- loadBMP "assets/grass.bmp"
   squirrel <- loadBMP "assets/squirrel.bmp"
-  let sprites = [grass, squirrel]
+  
+  --TODO : complete this pls ! 
+  let sprites = Sprite { picture = grass, dimensions = (32, 32) }:
+                Sprite { picture = squirrel, dimensions = (32, 32) }:
+                []
+  
 
   --place the game window in the center of the screen
   screenSize <- getScreenSize 

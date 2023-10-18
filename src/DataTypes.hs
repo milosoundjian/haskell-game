@@ -4,6 +4,7 @@ module DataTypes where
 import Data.Tree
 import qualified Data.Map as Mapping
 import System.Random
+import Graphics.Gloss
 
 import Constants
 
@@ -13,6 +14,7 @@ import Constants
 -- (0, 0) is the bottom left corner of the viewport
 -- coordinates are in the range (0, 0) -> (cols - 1, rows - 1)
 type Position = (Int, Int)
+type Dimensions = (Int, Int)
 
 type Character = Position
 
@@ -50,6 +52,12 @@ data GameState = GameState {
   moveHistory :: [GameState]
 }
 
+
+--data type for using external sprites
+data Sprite = Sprite {
+  picture :: Picture,
+  dimensions :: Dimensions
+}
 
 
 directionVectorMap :: Mapping.Map Direction (Int, Int)
