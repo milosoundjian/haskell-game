@@ -9,9 +9,16 @@ import DataTypes
 data Token = OP String | Pos Position | Name String
 type Command = [Token]
 
-ignoredChars = [Char]
+ignoredChars :: [Char]
 ignoredChars = [' ',  '\t',  '\r', '\n', '\v', '\f']
  
+-- helper functions for pre-processing
+rmFSpaces :: String -> String 
+rmFSpaces  = dropWhile (== ' ') 
+
+rmESpaces :: String -> String 
+rmESpaces input | (last input == ' ') = init input
+                | otherwise = input
 
 
 -- currently, just converts the input string to lowercase
@@ -19,8 +26,8 @@ preprocess :: String -> String
 preprocess input = toLower <$> (rmFSpaces . rmESpaces $ input)
 
 -- transforms our input string into a list of tokens
-parse :: String -> Command
-parse input =
+lex :: String -> Command
+lex input = undefined
     -- 1h30 spent on this : i can't do this anymore  
 
     -- case input of 
