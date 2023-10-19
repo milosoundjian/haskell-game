@@ -29,6 +29,7 @@ library
       DataTypes
       Interpreter
       Levels
+      Graphics
   other-modules:
       Paths_haskell_game
   autogen-modules:
@@ -41,6 +42,7 @@ library
     , containers
     , gloss
     , random
+    , GLUT
   default-language: Haskell2010
 
 executable haskell-game-exe
