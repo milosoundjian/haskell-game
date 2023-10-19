@@ -39,6 +39,7 @@ library:
   - containers
   - random
   - gloss
+  - GLUT
 
 executables:
   haskell-game-exe:
