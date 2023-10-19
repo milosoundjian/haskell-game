@@ -11,75 +11,31 @@ import DataTypes
 import Constants
 import Levels
 import Interpreter
+import Graphics
 
-
-
-
-
--- useful shorthand
-toFloat :: (Integral a1, Integral a2, Num a3, Num b) => (a1, a2) -> (a3, b)
-toFloat (x, y) = (fromIntegral x, fromIntegral y)
-
--- fills up the cell at the input coordinates with the input color
-fillCell :: Position -> Color -> Picture
-fillCell (posX, posY) col =
-  let 
-
-    centerRec = color col (rectangleSolid cellSize cellSize)
-    topLeftRec =
-      translate
-        (-gameWidth / 2 + cellSize / 2)
-        (-gameHeight / 2 + cellSize / 2)
-        centerRec
-   in 
-    translate ((fromIntegral posX) * cellSize) ((fromIntegral posY) * cellSize) topLeftRec
-
--- fills up the cell at input GAME coordinates with the input sprite
-spriteCell :: Position -> Sprite -> Picture
-spriteCell (x, y) (Sprite{picture=p, dimensions=(w, h)}) = 
-  let 
-    centerSprite = scale (cellSize / (fromIntegral w)) (cellSize / (fromIntegral h)) p
-    topLeftSprite = translate  (-gameWidth / 2 + cellSize / 2)
-                               (-gameHeight / 2 + cellSize / 2)
-                               centerSprite
-  in
-    translate ((fromIntegral x) * cellSize) ((fromIntegral y) * cellSize) topLeftSprite
-
--- creates a grid made up of list of lines
-grid :: [Picture]
-grid = verticalLines ++ horizontalLines
-  where
-    verticalLines = [Line [(x, -gameHeight / 2), (x, gameHeight / 2)] | x <- [-gameWidth / 2, -gameWidth / 2 + cellSize .. gameWidth / 2]]
-    horizontalLines = [Line [(-gameWidth / 2, y), (gameWidth / 2, y)] | y <- [-gameHeight / 2, -gameHeight / 2 + cellSize .. gameHeight / 2]]
-
-gameOverScreen :: [Picture]
-gameOverScreen = [bg, txt]
-  where
-    bg = color black $ rectangleSolid gameWidth gameHeight
-    txt = color red $ translate (-gameWidth / 2 + 150) 0 $ scale 0.5 0.5 (Text "YOU DIED")
-
-outOfBoundsScreen :: [Picture]
-outOfBoundsScreen = [bg, txt] 
-  where 
-    bg = color black $ rectangleSolid gameWidth gameHeight
-    txt = color red $ translate (-gameWidth / 2 + 150) 0 $ scale 0.5 0.5 (Text "OUT OF BOUNDS")
 
 
 -- display the user character + the current text input
-renderRoom :: [Sprite] -> RoomState -> Picture
-renderRoom sprites roomState = 
+renderRoom :: Picture -> [Sprite] -> RoomState -> Picture
+renderRoom backgroundP sprites@(squirrelS:_) roomState = 
   let 
+    --display the background 
+
+
     --display the player
-    playerSprite = fillCell (character roomState) black
+    player = spriteCell (character roomState) (squirrelS)
 
   in
     -- combine everything
-    pictures (playerSprite:grid)
+    pictures [backgroundP, grid, player]
+
+-- fallback in case one of the sprites arguments wasn't passed in 
+renderRoom _ _ _ = grid 
 
 
 -- display each game room at the proper position
-render :: [Sprite] -> GameState  -> Picture
-render sprites gameState =
+render :: Picture -> [Sprite] -> GameState  -> Picture
+render backgroundP sprites@(squirrelS:_) gameState =
   let 
     --print the text and the cursor
     cursorSuffix = if (isCursorVisible gameState) 
@@ -96,23 +52,23 @@ render sprites gameState =
         scale 0.1 0.1 (text . debugText $ gameState)
 
 
-    --sprite rendering test
-    squirrelS = spriteCell (5, 5) (sprites !! 0)
+
 
     --render only the rooms we need thanks to lazy eval
-    firstRoom = renderRoom sprites (rooms gameState !! 0)
-    secondRoom = renderRoom sprites (rooms gameState !! 1)
-    thirdRoom = renderRoom sprites (rooms gameState !! 2)
-    fourthRoom = renderRoom sprites (rooms gameState !! 3)
+    firstRoom = renderRoom backgroundP sprites (rooms gameState !! 0)
+    secondRoom = renderRoom backgroundP sprites (rooms gameState !! 1)
+    thirdRoom = renderRoom backgroundP sprites (rooms gameState !! 2)
+    fourthRoom = renderRoom backgroundP sprites (rooms gameState !! 3)
 
    in 
     case (length . rooms $ gameState) of 
-      0 -> pictures outOfBoundsScreen
-      1 -> pictures [firstRoom, userDisplay, debugDisplay, squirrelS]
+      0 -> nullScreen
+      1 -> pictures [firstRoom, userDisplay, debugDisplay]
       2 -> undefined
       3 -> undefined
       4 -> undefined 
 
+render _ _ _ = displayErrorScreen
 
 
 update :: Float -> GameState -> GameState
@@ -185,10 +141,14 @@ main = do
   grass <- loadBMP "assets/grass.bmp"
   squirrel <- loadBMP "assets/squirrel.bmp"
   
-  --TODO : complete this pls ! 
-  let sprites = Sprite { picture = grass, dimensions = (32, 32) }:
-                Sprite { picture = squirrel, dimensions = (32, 32) }:
-                []
+  let grassS = Sprite  {picture = grass, dimensions = (32,32)}
+  let squirrelS = Sprite  {picture = squirrel, dimensions = (32,32)}
+
+  let sprites = [squirrelS]
+                
+
+  -- generate the background once, for all future uses
+  let backgroundP = getBackground grassS
   
 
   --place the game window in the center of the screen
@@ -199,4 +159,5 @@ main = do
   let window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) 
                (round xCentered, round yCentered)
 
-  play window background framerate initialGameState (render sprites) handleKeys update
+  play window backgroundCol framerate initialGameState 
+       (render backgroundP sprites) handleKeys update
