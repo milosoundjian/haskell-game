@@ -5,6 +5,7 @@ import Data.Char
 import Graphics.Gloss
 
 import DataTypes
+import Levels
 
 -- This is the file that will interpret user commands
 
@@ -93,10 +94,14 @@ posPass (x:rest) = x:posPass rest
 
 
 interpret :: String -> GameState -> GameState
-interpret input gameState =
+interpret input gs =
     let
         command = posPass . mergePass. namePass. preprocess $ input
+
     in
-        gameState {debugText = show command }
+        case command of
+            [OP MOVE, Prep AT, Pos newPos] -> 
+                    gs {rooms = map (`movedToRoomState` newPos) (rooms gs)  }   
+            _ -> gs {debugText = "Command not recognized:" ++ (show command)}
 
 

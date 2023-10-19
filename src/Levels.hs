@@ -19,10 +19,19 @@ move (charX, charY) direction =
     (clamp 0 (cols - 1) (fst newChar), clamp 0 (rows - 1) (snd newChar))
 
 
+movedToRoomState :: RoomState -> Position -> RoomState
+movedToRoomState rs (x,y) = 
+  let
+    legalX = clamp 0 (cols - 1) x 
+    legalY = clamp 0 (rows - 1) y
+  in
+    rs {character = (legalX, legalY)}
+
 movedRoomState :: RoomState -> Direction -> RoomState
 movedRoomState rs dir = 
   rs {character = move (character rs) dir, 
       charRot = directionAngleMap dir}
+
 
 movedGameState :: GameState -> Direction -> GameState
 movedGameState gs dir =
