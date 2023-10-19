@@ -7,13 +7,26 @@ import Graphics.Gloss
 import DataTypes
 
 -- This is the file that will interpret user commands
-data Token = OP String | Pos Position | Name String 
-             deriving Show
+
+-- All of the constant definitions start here
+data Operation = ADD | SUB | MOVE  deriving (Show, Eq)
+data Prep = BY | AT deriving (Show, Eq)
+
+-- after all passes there shouldn't be any tokens of type Digit or Ch
+data Token = OP Operation | Prep Prep | Special Char | Ch Char | Digit Int | Name String | Number Int |
+             Pos Position
+                deriving (Show, Eq) 
+
                 
 type Command = [Token]
 
 ignoredChars :: [Char]
-ignoredChars = [' ',  '\t',  '\r', '\n', '\v', '\f']
+ignoredChars = [' ', '.', '\t',  '\r', '\n', '\v', '\f']
+
+specialChars :: [Char]
+specialChars = [',', '(', ')']
+-- All of the constant definitions end here
+
  
 -- helper functions for pre-processing
 rmFSpaces :: String -> String 
@@ -29,42 +42,60 @@ preprocess :: String -> String
 preprocess input = toLower <$> (rmFSpaces . rmESpaces $ input)
 
 -- student makes WORST parser EVER, asked to LEAVE CSE301
-lex :: String -> Command
-lex input = 
+namePass :: String -> [Token]
+namePass input = 
     case input of 
         "" -> []
-        (c:rest) | elem c ignoredChars -> lex rest
+        (c:rest) | elem c ignoredChars -> namePass rest
 
-        --parsing operations 
-        ('a':'d':'d':rest) -> OP "add" : lex rest
-        ('s':'u':'b':rest) -> OP "sub" : lex rest
+        -- recognizing operation names
+        ('a':'d':'d':rest) -> OP ADD : namePass rest
+        ('s':'u':'b':rest) -> OP SUB : namePass rest
+        ('m':'o':'v':'e':rest) -> OP MOVE : namePass rest
 
-        --parsing tuples (terrible code) (TODO : should use multi-pass approach)
-        ('(':x:',':y:')':rest) | isDigit x && isDigit y -> 
-            Pos (digitToInt x, digitToInt y) : lex rest
-        ('(':x1:x2:',':y:')':rest) | and (isDigit <$> [x1, x2, y]) -> 
-            Pos (digitToInt x1 * 10 + digitToInt x2, digitToInt y) : lex rest
-        ('(':x:',':y1:y2:')':rest) | and (isDigit <$> [x, y1, y2]) -> 
-            Pos (digitToInt x, digitToInt y1 * 10 + digitToInt y2) : lex rest
-        ('(':x1:x2:',':y1:y2:')':rest) | and (isDigit <$> [x1, x2, y1, y2]) -> 
-            Pos (digitToInt x1 * 10 + digitToInt x2, digitToInt y1 * 10 + digitToInt y2) : lex rest
-        
-        --all lonely characters will be merged eventually
-        (c:rest) -> Name (c:[]) : lex rest
+        -- recognizing preposition names
+        ('a':'t':rest) -> Prep AT : namePass rest
+        ('b':'y':rest) -> Prep BY : namePass rest
 
-mergeNames :: Command -> Command 
-mergeNames [] = []
-mergeNames (Name a:Name b:rest) = mergeNames (Name (a ++ b):rest)
-mergeNames (x:xs) = x:(mergeNames xs)
+        --sorting anything else into chars and digits
+        (d:rest) | isDigit d -> Digit (digitToInt d) : namePass rest
+        (c:rest) -> if (elem c specialChars) then 
+                        (Special c : namePass rest) 
+                    else 
+                        (Ch c: namePass rest)
 
 
 
+-- This pass merges all of the lonely chars and lonely digits together 
+mergePass :: [Token] -> [Token]
+mergePass [] = []
+
+mergePass (Ch a:Ch b:rest) = mergePass $ Name [a,b]: rest
+mergePass (Name a:Ch b:rest) = mergePass $ Name (a ++ [b]) : rest
+
+mergePass (Digit a:Digit b:rest) = mergePass $ Number (a*10 + b) : rest
+mergePass (Number a:Digit b:rest) = mergePass $ Number (a * 10 + b) : rest
+
+mergePass (Ch a :rest) = Name [a] :mergePass rest
+mergePass (Digit a : rest) = Number a : mergePass rest
+mergePass (other : rest) = other:mergePass rest
+
+
+
+-- Final pass : greedy combination of as many number clusters into positions
+-- Also eliminate any special characters that don't fit into anything
+posPass :: [Token] -> Command 
+posPass [] = []
+
+posPass (Special '(':Number x:Special ',':Number y: Special ')':rest) = Pos (x,y):posPass rest
+posPass (Special c : rest) = posPass rest
+posPass (x:rest) = x:posPass rest
 
 
 interpret :: String -> GameState -> GameState
 interpret input gameState =
     let
-        command = mergeNames . lex . preprocess $ input
+        command = posPass . mergePass. namePass. preprocess $ input
     in
         gameState {debugText = show command }
 
