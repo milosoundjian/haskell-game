@@ -31,9 +31,19 @@ fillCell (posX, posY) col =
         (-gameWidth / 2 + cellSize / 2)
         (-gameHeight / 2 + cellSize / 2)
         centerRec
-
    in 
     translate ((fromIntegral posX) * cellSize) ((fromIntegral posY) * cellSize) topLeftRec
+
+-- fills up the cell at input GAME coordinates with the input sprite
+spriteCell :: Position -> Sprite -> Picture
+spriteCell (x, y) (Sprite{picture=p, dimensions=(w, h)}) = 
+  let 
+    centerSprite = scale (cellSize / (fromIntegral w)) (cellSize / (fromIntegral h)) p
+    topLeftSprite = translate  (-gameWidth / 2 + cellSize / 2)
+                               (-gameHeight / 2 + cellSize / 2)
+                               centerSprite
+  in
+    translate ((fromIntegral x) * cellSize) ((fromIntegral y) * cellSize) topLeftSprite
 
 -- creates a grid made up of list of lines
 grid :: [Picture]
@@ -64,7 +74,7 @@ renderRoom sprites roomState =
 
   in
     -- combine everything
-    pictures ([playerSprite] ++ grid ++ (map picture sprites))
+    pictures (playerSprite:grid)
 
 
 -- display each game room at the proper position
@@ -76,10 +86,18 @@ render sprites gameState =
                    then cursorCharacter else ""
 
     textContent = userText gameState ++ cursorSuffix 
-    displayText =
+    userDisplay =
       color red $
         translate (-gameWidth / 2 + cellSize / 2) (-gameHeight / 2 + cellSize / 2) $
           scale 0.25 0.25 (text textContent) :: Picture
+
+    debugDisplay = 
+      translate (-gameWidth /2 + cellSize/2) (gameHeight/2 - cellSize / 2) $
+        scale 0.1 0.1 (text . debugText $ gameState)
+
+
+    --sprite rendering test
+    squirrelS = spriteCell (5, 5) (sprites !! 0)
 
     --render only the rooms we need thanks to lazy eval
     firstRoom = renderRoom sprites (rooms gameState !! 0)
@@ -90,7 +108,7 @@ render sprites gameState =
    in 
     case (length . rooms $ gameState) of 
       0 -> pictures outOfBoundsScreen
-      1 -> pictures [firstRoom, displayText]
+      1 -> pictures [firstRoom, userDisplay, debugDisplay, squirrelS]
       2 -> undefined
       3 -> undefined
       4 -> undefined 
@@ -156,7 +174,7 @@ handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs =
   }
 
 handleKeys (EventKey (SpecialKey KeyEnter) Down _ _) gs = 
-  (interpret (userText gs) gs) --{userText = ""}
+  (interpret (userText gs) gs) {userText = ""}
   
 
 handleKeys _ gameState = gameState

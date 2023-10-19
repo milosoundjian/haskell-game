@@ -66,6 +66,6 @@ interpret input gameState =
     let
         command = mergeNames . lex . preprocess $ input
     in
-        gameState {userText = show command }
+        gameState {debugText = show command }
 
 

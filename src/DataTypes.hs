@@ -40,6 +40,7 @@ type Level = Tree RoomState
 data GameState = GameState {
   -- ui related stuff
   userText :: String,
+  debugText :: String,
   isCursorVisible :: Bool,
   randomStdGen :: StdGen,
 

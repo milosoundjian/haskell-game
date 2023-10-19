@@ -36,6 +36,7 @@ initialGameState =
   GameState
     { 
       userText = "Lorem Ipsum",
+      debugText = "Debug output :",
       isCursorVisible = True,
       randomStdGen = mkStdGen 100,
 

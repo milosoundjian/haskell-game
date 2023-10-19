@@ -13,7 +13,7 @@ cols :: Int
 cols = 20
 
 cellSize :: Float
-cellSize = 32
+cellSize = 40
 
 
 gameWidth :: Float
