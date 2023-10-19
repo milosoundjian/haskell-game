@@ -28,7 +28,6 @@ library
       Constants
       DataTypes
       Interpreter
-      Level
       Levels
   other-modules:
       Paths_haskell_game

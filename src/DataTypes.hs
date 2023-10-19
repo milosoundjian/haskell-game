@@ -65,7 +65,7 @@ directionVectorMap =
   Mapping.fromList $
     zip
       [UP, DOWN, LEFT, RIGHT]
-      [(0, 1), (0, (-1)), ((-1), 0), (1, 0)]
+      [(0, 1), (0, -1), (-1, 0), (1, 0)]
 
 
 clamp :: (Ord a) => a -> a -> a -> a
