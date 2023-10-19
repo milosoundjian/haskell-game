@@ -2,7 +2,6 @@
 module DataTypes where
 
 import Data.Tree
-import qualified Data.Map as Mapping
 import System.Random
 import Graphics.Gloss
 
@@ -18,7 +17,7 @@ type Dimensions = (Int, Int)
 
 type Character = Position
 
-data Direction = UP | DOWN | LEFT | RIGHT deriving (Eq, Ord)
+data Direction = UP | DOWN | LEFT | RIGHT deriving (Eq, Ord, Enum)
 
 type Obstacles = [Position]
 type Spikes = [Position]
@@ -26,6 +25,7 @@ type Spikes = [Position]
 data RoomState = RoomState
   {
       character :: Character,
+      charRot :: Float, -- character rotation
 
       spikes :: Spikes,
       obstacles :: Obstacles,
@@ -61,12 +61,15 @@ data Sprite = Sprite {
 }
 
 
-directionVectorMap :: Mapping.Map Direction (Int, Int)
-directionVectorMap =
-  Mapping.fromList $
-    zip
-      [UP, DOWN, LEFT, RIGHT]
-      [(0, 1), (0, -1), (-1, 0), (1, 0)]
+directionVectorMap :: Direction -> (Int, Int)
+directionVectorMap dir =
+      [(0, 1), (0, -1), (-1, 0), (1, 0)] !! (fromEnum dir)
+
+-- Converts direction to angle of rotation needed to match
+-- that rotation (assuming start orientation is looking down)
+directionAngleMap :: Direction -> Float
+directionAngleMap dir = 
+  [180, 0, 90, -90] !! (fromEnum dir)
 
 
 clamp :: (Ord a) => a -> a -> a -> a

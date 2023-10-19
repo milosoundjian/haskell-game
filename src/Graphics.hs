@@ -22,15 +22,17 @@ fillCell (posX, posY) col =
     translate ((fromIntegral posX) * cellSize) ((fromIntegral posY) * cellSize) topLeftRec
 
 -- fills up the cell at input GAME coordinates with the input sprite
-spriteCell :: Position -> Sprite -> Picture
-spriteCell (x, y) (Sprite{picture=p, dimensions=(w, h)}) = 
+spriteCell :: Position -> Float -> Sprite -> Picture
+spriteCell (x, y) rotation (Sprite{picture=pic, dimensions=(w, h)}) = 
   let 
-    centerSprite = scale (cellSize / (fromIntegral w)) (cellSize / (fromIntegral h)) p
-    topLeftSprite = translate  (-gameWidth / 2 + cellSize / 2)
-                               (-gameHeight / 2 + cellSize / 2)
-                               centerSprite
+    centerSprite = rotate rotation $ 
+                   scale (cellSize / (fromIntegral w)) (cellSize / (fromIntegral h)) pic
+
+    finSprite = translate  (-gameWidth / 2 + cellSize / 2 + (fromIntegral x) * cellSize)
+                           (-gameHeight / 2 + cellSize / 2 + (fromIntegral y) * cellSize)
+                           centerSprite
   in
-    translate ((fromIntegral x) * cellSize) ((fromIntegral y) * cellSize) topLeftSprite
+    finSprite
 
 
 
@@ -75,4 +77,4 @@ nullScreen = textOnScreen "0" black white
 -- tessellates the input sprite to form a background cover 
 getBackground :: Sprite -> Picture 
 getBackground spr = 
-    pictures [spriteCell (x, y) spr | x <- [0..(cols-1)], y <- [0..(rows-1)] ]
+    pictures [spriteCell (x, y) 0 spr | x <- [0..(cols-1)], y <- [0..(rows-1)] ]

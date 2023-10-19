@@ -23,7 +23,8 @@ renderRoom backgroundP sprites@(squirrelS:_) roomState =
 
 
     --display the player
-    player = spriteCell (character roomState) (squirrelS)
+    rotation = charRot roomState
+    player = spriteCell (character roomState) rotation (squirrelS)
 
   in
     -- combine everything

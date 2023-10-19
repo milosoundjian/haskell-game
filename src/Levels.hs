@@ -1,7 +1,6 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Levels where
 
-import qualified Data.Map as Mapping
 import System.Random
 
 import Constants
@@ -14,7 +13,7 @@ import DataTypes
 move :: Character -> Direction -> Character
 move (charX, charY) direction =
   let 
-    dirVector = directionVectorMap Mapping.! direction
+    dirVector = directionVectorMap direction
     newChar = (charX + fst dirVector, charY + snd dirVector)
    in 
     (clamp 0 (cols - 1) (fst newChar), clamp 0 (rows - 1) (snd newChar))
@@ -22,7 +21,8 @@ move (charX, charY) direction =
 
 movedRoomState :: RoomState -> Direction -> RoomState
 movedRoomState rs dir = 
-  rs {character = move (character rs) dir}
+  rs {character = move (character rs) dir, 
+      charRot = directionAngleMap dir}
 
 movedGameState :: GameState -> Direction -> GameState
 movedGameState gs dir =
@@ -53,6 +53,7 @@ debugRoom =
     RoomState 
     {
         character = (10, 10),
+        charRot = 0,
 
         spikes = [],
         obstacles = [],
