@@ -1,7 +1,6 @@
 module Graphics where 
 
 import Graphics.Gloss
-import Graphics.UI.GLUT.Fonts
 
 import DataTypes
 import Constants
@@ -43,15 +42,15 @@ grid = pictures (verticalLines ++ horizontalLines)
     verticalLines = [Line [(x, -gameHeight / 2), (x, gameHeight / 2)] | x <- [-gameWidth / 2, -gameWidth / 2 + cellSize .. gameWidth / 2]]
     horizontalLines = [Line [(-gameWidth / 2, y), (gameWidth / 2, y)] | y <- [-gameHeight / 2, -gameHeight / 2 + cellSize .. gameHeight / 2]]
 
-textOnScreen :: String -> Color -> Color -> Picture
-textOnScreen textString textCol backCol =
+textOnScreen :: String -> Float -> Color -> Color -> Picture
+textOnScreen textString textWidth textCol backCol =
     let 
         bg = color backCol $ rectangleSolid gameWidth gameHeight
 
         -- txtWidth = fromIntegral (stringWidth Roman textString)
         -- txtHeight = fromIntegral . fontHeight $ Roman
 
-        txt = color textCol $ translate 0 0 $ scale 0.5 0.5 (Text textString)
+        txt = color textCol $ translate (-textWidth / 4) 0 $ scale 0.5 0.5 (Text textString)
 
         -- txt = color textCol $ translate (gameWidth/2 - txtWidth/2) 
         --                                 (gameHeight/2 - txtHeight/2) $ 
@@ -61,16 +60,16 @@ textOnScreen textString textCol backCol =
         pictures [bg, txt]
 
 gameOverScreen :: Picture
-gameOverScreen = textOnScreen "YOU DIED" red black
+gameOverScreen = textOnScreen "YOU DIED" 633 red black
 
 outOfBoundsScreen :: Picture
-outOfBoundsScreen = textOnScreen "OUT OF BOUNDS" red black
+outOfBoundsScreen = textOnScreen "HOW?" 352 black white
 
 displayErrorScreen :: Picture 
-displayErrorScreen = textOnScreen "COULDN'T RENDER SCENE :(" red black
+displayErrorScreen = textOnScreen "Render function error" 1369 red black
 
 nullScreen :: Picture 
-nullScreen = textOnScreen "0" black white
+nullScreen = textOnScreen "0" 70 black white
 
 
 
