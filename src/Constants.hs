@@ -7,13 +7,13 @@ import Graphics.Gloss
 --  GAME CONSTANTS start here :
 -- screen dimensions are float to reduce number of type casts in computation
 rows :: Int
-rows = 15
+rows = 8
 
 cols :: Int
-cols = 20
+cols = 12
 
 cellSize :: Float
-cellSize = 40
+cellSize = 80
 
 
 gameWidth :: Float

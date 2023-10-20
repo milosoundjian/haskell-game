@@ -24,13 +24,24 @@ movedToRoomState rs (x,y) =
   let
     legalX = clamp 0 (cols - 1) x 
     legalY = clamp 0 (rows - 1) y
+    newPos = (legalX, legalY)
   in
-    rs {character = (legalX, legalY)}
+    -- only allow purely legal moves (no water losses either)
+    if not (newPos `elem` (boxes rs) && newPos `elem` (waters rs)) then
+      rs {character = (legalX, legalY)}
+    else 
+      rs
 
 movedRoomState :: RoomState -> Direction -> RoomState
 movedRoomState rs dir = 
-  rs {character = move (character rs) dir, 
-      charRot = directionAngleMap dir}
+  let
+    newPos = move (character rs) dir 
+  in
+    -- kill player if go into water, prevent them from moving if go into box
+    case (newPos `elem` (boxes rs), newPos `elem` (waters rs)  ) of 
+      (True, _) -> rs {charRot = directionAngleMap dir}
+      (False, True) -> rs {charRot = directionAngleMap dir} --TODO : kill the player here
+      (False, False) -> rs {character = newPos, charRot = directionAngleMap dir}
 
 
 movedGameState :: GameState -> Direction -> GameState
@@ -64,8 +75,8 @@ debugRoom =
         character = (10, 10),
         charRot = 0,
 
-        spikes = [],
-        obstacles = [],
+        waters = [(2, 3), (3, 3), (3, 4), (10, 4)],
+        boxes = [(0, 5), (7, 4)],
 
         isTerminal = True,
         specialPos = (15, 10)

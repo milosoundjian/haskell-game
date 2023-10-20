@@ -17,18 +17,21 @@ import Graphics
 
 -- display the user character + the current text input
 renderRoom :: Picture -> [Sprite] -> RoomState -> Picture
-renderRoom backgroundP sprites@(squirrelS:_) roomState = 
+renderRoom backgroundP sprites@(squirrelS:boxS:waterS:_) roomState = 
   let 
-    --display the background 
-
-
     --display the player
     rotation = charRot roomState
     player = spriteCell (character roomState) rotation (squirrelS)
 
+    renderWaters = (\pos -> spriteCell pos 0 waterS) 
+    renderBoxes = (\pos -> spriteCell pos 0 boxS)
+
+    watersP = map renderWaters (waters roomState)  
+    boxesP = map renderBoxes (boxes roomState)
+
   in
     -- combine everything
-    pictures [backgroundP, grid, player]
+    pictures ([backgroundP, grid, player] ++ watersP ++ boxesP)
 
 -- fallback in case one of the sprites arguments wasn't passed in 
 renderRoom _ _ _ = grid 
@@ -36,7 +39,7 @@ renderRoom _ _ _ = grid
 
 -- display each game room at the proper position
 render :: Picture -> [Sprite] -> GameState  -> Picture
-render backgroundP sprites@(squirrelS:_) gameState =
+render backgroundP sprites@(squirrelS:boxS:waterS:_) gameState =
   let 
     --print the text and the cursor
     cursorSuffix = if (isCursorVisible gameState) 
@@ -141,11 +144,17 @@ main = do
   -- load the assets for the render function
   grass <- loadBMP "assets/grass.bmp"
   squirrel <- loadBMP "assets/squirrel.bmp"
-  
-  let grassS = Sprite  {picture = grass, dimensions = (32,32)}
-  let squirrelS = Sprite  {picture = squirrel, dimensions = (32,32)}
+  box <- loadBMP ("assets/box.bmp")
+  water <- loadBMP ("assets/water.bmp")
 
-  let sprites = [squirrelS]
+  
+  let grassS = Sprite  {picture = grass, dimensions = (32,32)} --only used rn for the background
+
+  let squirrelS = Sprite  {picture = squirrel, dimensions = (32,32)}
+  let boxS = Sprite {picture = box, dimensions = (32, 32)}
+  let waterS = Sprite {picture = water, dimensions = (32, 32)}
+
+  let sprites = [squirrelS, boxS, waterS]
                 
 
   -- generate the background once, for all future uses
