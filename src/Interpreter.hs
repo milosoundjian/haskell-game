@@ -11,7 +11,7 @@ import Levels
 
 -- All of the constant definitions start here
 data Operation = ADD | SUB | MOVE  deriving (Show, Eq)
-data Prep = BY | AT deriving (Show, Eq)
+data Prep = BY | AT | TO deriving (Show, Eq)
 
 -- after all passes there shouldn't be any tokens of type Digit or Ch
 data Token = OP Operation | Prep Prep | Special Char | Ch Char | Digit Int | Name String | Number Int |
@@ -47,9 +47,8 @@ namePass :: String -> [Token]
 namePass input = 
     case input of 
         "" -> []
-        (c:rest) | elem c ignoredChars -> namePass rest
 
-        -- recognizing operation names
+        -- recognizing operation names ONLY if they're isolated 
         ('a':'d':'d':rest) -> OP ADD : namePass rest
         ('s':'u':'b':rest) -> OP SUB : namePass rest
         ('m':'o':'v':'e':rest) -> OP MOVE : namePass rest
@@ -57,6 +56,11 @@ namePass input =
         -- recognizing preposition names
         ('a':'t':rest) -> Prep AT : namePass rest
         ('b':'y':rest) -> Prep BY : namePass rest
+        ('t':'o':rest) -> Prep TO : namePass rest
+
+        -- skipping empty characters for anything else
+        (c:rest) | elem c ignoredChars -> namePass rest
+
 
         --sorting anything else into chars and digits
         (d:rest) | isDigit d -> Digit (digitToInt d) : namePass rest
@@ -94,14 +98,22 @@ posPass (x:rest) = x:posPass rest
 
 
 interpret :: String -> GameState -> GameState
+interpret "" gs = gs
 interpret input gs =
     let
         command = posPass . mergePass. namePass. preprocess $ input
 
     in
         case command of
-            [OP MOVE, Prep AT, Pos newPos] -> 
+            [OP MOVE, Prep TO, Pos newPos] -> 
                     gs {rooms = map (`movedToRoomState` newPos) (rooms gs)  }   
-            _ -> gs {debugText = "Command not recognized:" ++ (show command)}
+
+            [OP ADD, Name "box", Prep AT, Pos newPos] ->
+                    gs {rooms = map (`addBox` newPos) (rooms gs)}
+            
+            [OP ADD, Name "water", Prep AT, Pos newPos] ->
+                    gs {rooms = map (`addWater` newPos) (rooms gs)}
+
+            _ -> gs {debugText = "Command not recognized: " ++ (show command)}
 
 

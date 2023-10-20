@@ -6,6 +6,7 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import Graphics.Gloss.Interface.Environment
 
+
 --internal imports
 import DataTypes
 import Constants
@@ -39,7 +40,9 @@ renderRoom _ _ _ = grid
 
 -- display each game room at the proper position
 render :: Picture -> [Sprite] -> GameState  -> Picture
-render backgroundP sprites@(squirrelS:boxS:waterS:_) gameState =
+render backgroundP sprites@(squirrelS:boxS:waterS:_) gameState  
+  | gameOver gameState = gameOverScreen
+  | otherwise = 
   let 
     --print the text and the cursor
     cursorSuffix = if (isCursorVisible gameState) 
@@ -82,12 +85,15 @@ update seconds gameState =
     newElapsed = elapsedFrames gameState + 1
     newVisibility = not (isCursorVisible gameState)
 
+    -- check that none of the rooms have gamed overed
+    gameOverState = (gameOver gameState || any rGameOver (rooms gameState))
+
   in
     --handle all timer related utilities
     if (mod newElapsed cursorFlickerDuration == 0) then 
-      gameState {elapsedFrames = newElapsed, isCursorVisible = newVisibility}
+      gameState {gameOver = gameOverState, elapsedFrames = newElapsed, isCursorVisible = newVisibility}
     else
-      gameState {elapsedFrames = newElapsed}
+      gameState {gameOver = gameOverState, elapsedFrames = newElapsed}
 
 
 
@@ -168,6 +174,8 @@ main = do
   let yCentered = (fromIntegral (snd screenSize) - gameHeight) / 2.0 
   let window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) 
                (round xCentered, round yCentered)
+
+
 
   play window backgroundCol framerate initialGameState 
        (render backgroundP sprites) handleKeys update

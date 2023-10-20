@@ -20,7 +20,9 @@ move (charX, charY) direction =
 
 
 movedToRoomState :: RoomState -> Position -> RoomState
-movedToRoomState rs (x,y) = 
+movedToRoomState rs (x,y)
+  | rGameOver rs = rs
+  | otherwise = 
   let
     legalX = clamp 0 (cols - 1) x 
     legalY = clamp 0 (rows - 1) y
@@ -33,22 +35,38 @@ movedToRoomState rs (x,y) =
       rs
 
 movedRoomState :: RoomState -> Direction -> RoomState
-movedRoomState rs dir = 
+movedRoomState rs dir 
+  | (rGameOver rs) = rs -- don't do anything if room is game overed
+  | otherwise = 
   let
     newPos = move (character rs) dir 
   in
     -- kill player if go into water, prevent them from moving if go into box
     case (newPos `elem` (boxes rs), newPos `elem` (waters rs)  ) of 
       (True, _) -> rs {charRot = directionAngleMap dir}
-      (False, True) -> rs {charRot = directionAngleMap dir} --TODO : kill the player here
+      (False, True) -> rs {character = newPos, charRot = directionAngleMap dir, rGameOver = True} 
       (False, False) -> rs {character = newPos, charRot = directionAngleMap dir}
 
 
 movedGameState :: GameState -> Direction -> GameState
-movedGameState gs dir =
-  gs {rooms = map (`movedRoomState` dir) (rooms gs) }
+movedGameState gs dir 
+  -- use short-circuiting
+  | (gameOver gs || any (rGameOver) (rooms gs)) = gs {gameOver = True}
+  | otherwise = gs {rooms = map (`movedRoomState` dir) (rooms gs) }
 
+addBox :: RoomState -> Position -> RoomState
+addBox rs addPos =
+  if (elem addPos (boxes rs)) then 
+    rs
+  else 
+    rs {boxes = addPos:(boxes rs) } 
 
+addWater :: RoomState -> Position -> RoomState
+addWater rs addPos =
+  if (elem addPos (waters rs)) then 
+    rs
+  else 
+    rs {waters = addPos:(waters rs) } 
 
 --Helper INSTANCES
 initialGameState :: GameState
@@ -62,6 +80,7 @@ initialGameState =
 
       elapsedFrames = 0,
       levelIndex = -1,
+      gameOver = False,
 
       rooms = [debugRoom],
       moveHistory = []
@@ -79,5 +98,7 @@ debugRoom =
         boxes = [(0, 5), (7, 4)],
 
         isTerminal = True,
-        specialPos = (15, 10)
+        specialPos = (15, 10),
+
+        rGameOver = False
     }

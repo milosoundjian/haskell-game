@@ -31,7 +31,9 @@ data RoomState = RoomState
       boxes :: Boxes,
 
       isTerminal :: Bool,
-      specialPos :: Position
+      specialPos :: Position,
+
+      rGameOver :: Bool
   }
 
 
@@ -47,6 +49,7 @@ data GameState = GameState {
   -- game flow related stuff
   elapsedFrames :: Int,
   levelIndex :: Int,
+  gameOver :: Bool,
 
   -- gameplay related stuff
   rooms :: [RoomState],
