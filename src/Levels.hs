@@ -33,7 +33,7 @@ movedToRoomState rs (x,y)
     newPos = (legalX, legalY)
   in
     -- only allow purely legal moves (no water losses either)
-    if not (newPos `elem` (boxes rs) && newPos `elem` (waters rs)) then
+    if not (newPos `elem` (spikes rs) && newPos `elem` (waters rs)) then
       rs {character = (legalX, legalY)}
     else 
       rs
@@ -45,8 +45,8 @@ movedRoomState rs dir
   let
     newPos = move (character rs) dir 
   in
-    -- kill player if go into water, prevent them from moving if go into box
-    case (newPos `elem` (boxes rs), newPos `elem` (waters rs)  ) of 
+    -- kill player if go into spikes, prevent them from moving if go into water
+    case (newPos `elem` (waters rs), newPos `elem` (spikes rs)) of 
       (True, _) -> rs {charRot = directionAngleMap dir}
       (False, True) ->  rs {character = newPos, charRot = directionAngleMap dir, rGameOver = True} 
       (False, False) ->  rs {character = newPos, charRot = directionAngleMap dir}
@@ -69,12 +69,12 @@ undoLastMove gs
   | otherwise = head $ moveHistory gs 
     
 
-addBox :: RoomState -> Position -> RoomState
-addBox rs addPos =
-  if (elem addPos (boxes rs)) then 
+addSpike :: RoomState -> Position -> RoomState
+addSpike rs addPos =
+  if (elem addPos (spikes rs)) then 
     rs
   else 
-    rs {boxes = addPos:(boxes rs) } 
+    rs {spikes = addPos:(spikes rs) } 
 
 addWater :: RoomState -> Position -> RoomState
 addWater rs addPos =
@@ -83,7 +83,7 @@ addWater rs addPos =
   else 
     rs {waters = addPos:(waters rs) } 
 
---Helper INSTANCES
+--THIS IS WHERE we define the actual level data for all of the levels
 initialGameState :: GameState
 initialGameState =
   GameState
@@ -94,7 +94,7 @@ initialGameState =
       randomStdGen = mkStdGen 100,
 
       elapsedFrames = 0,
-      levelIndex = -1,
+      levelIndex = 0,
       gameOver = False,
 
       rooms = [debugRoom],
@@ -110,10 +110,14 @@ debugRoom =
         charRot = 0,
 
         waters = [(2, 3), (3, 3), (3, 4), (10, 4)],
-        boxes = [(0, 5), (7, 4)],
+        spikes = [(0, 5), (7, 4)],
 
         isTerminal = True,
         specialPos = (15, 10),
 
         rGameOver = False
     }
+
+-- combine all of the levels written above
+levelsData :: [GameState]
+levelsData = [initialGameState]

@@ -18,21 +18,21 @@ import Graphics
 
 -- display the user character + the current text input
 renderRoom :: Picture -> [Sprite] -> RoomState -> Picture
-renderRoom backgroundP sprites@(squirrelS:boxS:waterS:_) roomState = 
+renderRoom backgroundP sprites@(squirrelS:spikeS:waterS:_) roomState = 
   let 
     --display the player
     rotation = charRot roomState
     player = spriteCell (character roomState) rotation (squirrelS)
 
-    renderWaters = (\pos -> spriteCell pos 0 waterS) 
-    renderBoxes = (\pos -> spriteCell pos 0 boxS)
+    renderWaters pos = spriteCell pos 0 waterS
+    renderSpikes pos = spriteCell pos 0 spikeS
 
     watersP = map renderWaters (waters roomState)  
-    boxesP = map renderBoxes (boxes roomState)
+    spikesP = map renderSpikes (spikes roomState)
 
   in
     -- combine everything
-    pictures ([backgroundP, grid, player] ++ watersP ++ boxesP)
+    pictures ([backgroundP, grid, player] ++ watersP ++ spikesP)
 
 -- fallback in case one of the sprites arguments wasn't passed in 
 renderRoom _ _ _ = grid 
@@ -40,9 +40,7 @@ renderRoom _ _ _ = grid
 
 -- display each game room at the proper position
 render :: Picture -> [Sprite] -> GameState  -> Picture
-render backgroundP sprites@(squirrelS:boxS:waterS:_) gameState  
-  | gameOver gameState = gameOverScreen
-  | otherwise = 
+render backgroundP sprites@(squirrelS:spikeS:waterS:_) gameState =
   let 
     --print the text and the cursor
     cursorSuffix = if (isCursorVisible gameState) 
@@ -58,8 +56,8 @@ render backgroundP sprites@(squirrelS:boxS:waterS:_) gameState
       translate (-gameWidth /2 + cellSize/2) (gameHeight/2 - cellSize / 2) $
         scale 0.1 0.1 (text . debugText $ gameState)
 
-
-
+    -- add the game over on top of everything if we game overed
+    gameOverOverlay = if (gameOver gameState) then [gameOverScreen] else []
 
     --render only the rooms we need thanks to lazy eval
     firstRoom = renderRoom backgroundP sprites (rooms gameState !! 0)
@@ -70,7 +68,7 @@ render backgroundP sprites@(squirrelS:boxS:waterS:_) gameState
    in 
     case (length . rooms $ gameState) of 
       0 -> nullScreen
-      1 -> pictures [firstRoom, userDisplay, debugDisplay]
+      1 -> pictures ([firstRoom, userDisplay, debugDisplay] ++ gameOverOverlay) 
       2 -> undefined
       3 -> undefined
       4 -> undefined 
@@ -154,17 +152,17 @@ main = do
   -- load the assets for the render function
   grass <- loadBMP "assets/grass.bmp"
   squirrel <- loadBMP "assets/squirrel.bmp"
-  box <- loadBMP ("assets/box.bmp")
-  water <- loadBMP ("assets/water.bmp")
+  spike <- loadBMP "assets/spike.bmp"
+  water <- loadBMP "assets/water.bmp"
 
   
   let grassS = Sprite  {picture = grass, dimensions = (32,32)} --only used rn for the background
 
   let squirrelS = Sprite  {picture = squirrel, dimensions = (32,32)}
-  let boxS = Sprite {picture = box, dimensions = (32, 32)}
+  let spikeS = Sprite {picture = spike, dimensions = (32, 32)}
   let waterS = Sprite {picture = water, dimensions = (32, 32)}
 
-  let sprites = [squirrelS, boxS, waterS]
+  let sprites = [squirrelS, spikeS, waterS]
                 
 
   -- generate the background once, for all future uses
@@ -180,6 +178,6 @@ main = do
                (round xCentered, round yCentered)
 
 
-
-  play window backgroundCol framerate initialGameState 
+  --load the first level in list
+  play window backgroundCol framerate (head levelsData) 
        (render backgroundP sprites) handleKeys update
