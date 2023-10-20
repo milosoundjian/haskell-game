@@ -35,7 +35,6 @@ data RoomState = RoomState
   }
 
 
-type Level = Tree RoomState
 
 data GameState = GameState {
   -- ui related stuff
@@ -46,6 +45,7 @@ data GameState = GameState {
 
   -- game flow related stuff
   elapsedFrames :: Int,
+  gsIndex::Int,
   levelIndex :: Int,
   gameOver :: Bool,
 

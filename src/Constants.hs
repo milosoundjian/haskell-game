@@ -29,6 +29,8 @@ resetInput = KeyTab
 submitTextInput = KeyEnter
 clearTextInput = KeyDelete
 
+
+
 --  GAME CONSTANTS start here :
 -- screen dimensions are float to reduce number of type casts in computation
 rows :: Int

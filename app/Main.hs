@@ -24,15 +24,23 @@ renderRoom backgroundP sprites@(squirrelS:spikeS:waterS:_) roomState =
     rotation = charRot roomState
     player = spriteCell (character roomState) rotation (squirrelS)
 
+    -- display the grid entities
     renderWaters pos = spriteCell pos 0 waterS
     renderSpikes pos = spriteCell pos 0 spikeS
 
     watersP = map renderWaters (waters roomState)  
     spikesP = map renderSpikes (spikes roomState)
 
+    --display the special tile
+    -- TODO : replace the solid blocks with real assets
+    specialDraw = if (isTerminal roomState) 
+                    then (`fillCell` rose)
+                    else (`fillCell` orange)
+    specialP = specialDraw $ specialPos roomState
+
   in
     -- combine everything
-    pictures ([backgroundP, grid, player] ++ watersP ++ spikesP)
+    pictures ([backgroundP, grid, player, specialP] ++ watersP ++ spikesP)
 
 -- fallback in case one of the sprites arguments wasn't passed in 
 renderRoom _ _ _ = grid 
@@ -202,5 +210,5 @@ main = do
 
 
   --load the first level in list
-  play window backgroundCol framerate (head levelsData) 
+  play window backgroundCol framerate (head $ head levelsData) 
        (render backgroundP sprites) handleKeys update

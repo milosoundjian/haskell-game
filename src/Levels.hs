@@ -5,6 +5,7 @@ import System.Random
 
 import Constants
 import DataTypes
+import Graphics
 
 
 
@@ -32,24 +33,27 @@ movedToRoomState rs (x,y)
     legalY = clamp 0 (rows - 1) y
     newPos = (legalX, legalY)
   in
-    -- only allow purely legal moves (no water losses either)
-    if not (newPos `elem` (spikes rs) && newPos `elem` (waters rs)) then
+    -- only allow purely legal moves (no spike losses either)
+    if not (newPos `elem` spikes rs || newPos `elem` waters rs || newPos == specialPos rs ) then
       rs {character = (legalX, legalY)}
     else 
       rs
 
-movedRoomState :: RoomState -> Direction -> RoomState
-movedRoomState rs dir 
+movedRoomState ::  RoomState  -> Direction -> RoomState
+movedRoomState rs  dir
   | (rGameOver rs) = rs -- don't do anything if room is game overed
   | otherwise = 
   let
     newPos = move (character rs) dir 
   in
     -- kill player if go into spikes, prevent them from moving if go into water
-    case (newPos `elem` (waters rs), newPos `elem` (spikes rs)) of 
+    case (newPos `elem` waters rs, newPos `elem` spikes rs) of 
       (True, _) -> rs {charRot = directionAngleMap dir}
       (False, True) ->  rs {character = (-100, -100), charRot = directionAngleMap dir, rGameOver = True} 
       (False, False) ->  rs {character = newPos, charRot = directionAngleMap dir}
+      
+
+
 
 
 movedGameState :: GameState -> Direction -> GameState
@@ -59,6 +63,7 @@ movedGameState gs dir
       gs {gameOver = True}
       
   | otherwise = 
+      --call the movedRoom function and pass it the roomState + gameState
       (backup gs) {rooms = map (`movedRoomState` dir) (rooms gs) }
 
 
@@ -70,7 +75,27 @@ undoLastMove gs
 
 -- reloads the level at the current level id 
 restartLevel :: GameState -> GameState
-restartLevel gs = gs
+restartLevel (GameState{levelIndex = li, gsIndex = gi})
+  --using short circuiting
+  | (
+    li < (length levelsData) 
+  && gi < (length (levelsData !! li)) 
+  ) = 
+      (levelsData !! li) !! gi
+
+  | otherwise =  initialGameState
+
+--assumes there exists a next game state in cur level, otherwise returns the OoB scene
+nextGameState :: GameState -> GameState
+nextGameState (GameState {levelIndex = li, gsIndex = gi})
+  -- short circuiting, much wow, epic doggo, wholesome 100ù
+  | (
+    li < (length levelsData) 
+  && gi < (length (levelsData !! li) - 1) 
+  ) = 
+      (levelsData !! li) !! (gi + 1)
+
+  | otherwise =  initialGameState
     
 
 addSpike :: RoomState -> Position -> RoomState
@@ -87,7 +112,8 @@ addWater rs addPos =
   else 
     rs {waters = addPos:(waters rs) } 
 
---THIS IS WHERE we define the actual level data for all of the levels
+--THIS IS WHERE we define the actual level data for all of the 
+
 initialGameState :: GameState
 initialGameState =
   GameState
@@ -99,6 +125,7 @@ initialGameState =
 
       elapsedFrames = 0,
       levelIndex = 0,
+      gsIndex = 0, -- index of the game state within the level
       gameOver = False,
 
       rooms = [debugRoom],
@@ -116,7 +143,7 @@ debugRoom =
         waters = [(2, 3), (3, 3), (3, 4)],
         spikes = [(0, 5), (7, 4)],
 
-        isTerminal = True,
+        isTerminal = False,
         specialPos = (5, 5),
 
         rGameOver = False
@@ -124,5 +151,7 @@ debugRoom =
 
 -- combine all of the levels written above
 type Name = String
-levelsData :: [GameState]
-levelsData = [initialGameState]
+type Level = [GameState]
+
+levelsData :: [Level]
+levelsData = [[initialGameState, initialGameState {gsIndex = 1, rooms = [debugRoom {isTerminal = True}, debugRoom{isTerminal = True}, debugRoom{isTerminal = True}]}]]
