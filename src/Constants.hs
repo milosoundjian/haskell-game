@@ -4,6 +4,10 @@ module Constants where
 import Graphics.Gloss
 
 
+-- Meta constants: 
+debugModeEnabled :: Bool
+debugModeEnabled = True 
+
 --  GAME CONSTANTS start here :
 -- screen dimensions are float to reduce number of type casts in computation
 rows :: Int

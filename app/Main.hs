@@ -1,7 +1,7 @@
 module Main (main) where
 
 --external imports
-import Debug.Trace
+--import Debug.Trace
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import Graphics.Gloss.Interface.Environment
@@ -42,36 +42,55 @@ renderRoom _ _ _ = grid
 render :: Picture -> [Sprite] -> GameState  -> Picture
 render backgroundP sprites@(squirrelS:spikeS:waterS:_) gameState =
   let 
-    --print the text and the cursor
+    -- rendering all of the UI elements 
     cursorSuffix = if (isCursorVisible gameState) 
                    then cursorCharacter else ""
 
     textContent = userText gameState ++ cursorSuffix 
     userDisplay =
-      color red $
+      color white $
         translate (-gameWidth / 2 + cellSize / 2) (-gameHeight / 2 + cellSize / 2) $
-          scale 0.25 0.25 (text textContent) :: Picture
+          scale 0.25 0.25 (text textContent) 
 
     debugDisplay = 
       translate (-gameWidth /2 + cellSize/2) (gameHeight/2 - cellSize / 2) $
         scale 0.1 0.1 (text . debugText $ gameState)
 
-    -- add the game over on top of everything if we game overed
+    uiDisplay = (if debugModeEnabled then pictures [userTextBackdrop, userDisplay, debugDisplay]  
+                                     else pictures [userTextBackdrop, userDisplay])
+
+
+    -- show the game over screen if applicable
     gameOverOverlay = if (gameOver gameState) then [gameOverScreen] else []
 
-    --render only the rooms we need thanks to lazy eval
+    --render only the rooms we're gonna use thanks to lazy evaluation
     firstRoom = renderRoom backgroundP sprites (rooms gameState !! 0)
     secondRoom = renderRoom backgroundP sprites (rooms gameState !! 1)
     thirdRoom = renderRoom backgroundP sprites (rooms gameState !! 2)
     fourthRoom = renderRoom backgroundP sprites (rooms gameState !! 3)
 
+    firstRoomMini = translate (-gameWidth/4) (gameHeight/4) $ 
+                    scale 0.5 0.5 firstRoom 
+    secondRoomMini = translate (gameWidth/4) (gameHeight/4) $
+                     scale 0.5 0.5 secondRoom
+    thirdRoomMini = translate (-gameWidth/4) (-gameHeight/4) $
+                    scale 0.5 0.5 thirdRoom
+    fourthRoomMini = translate (gameWidth/4) (-gameHeight / 4) $ 
+                 scale 0.5 0.5 fourthRoom
+
+    fillerDouble = Blank
+    fillerSingle = Blank
+      
+
+
    in 
-    case (length . rooms $ gameState) of 
+    case (length $ rooms gameState) of 
       0 -> nullScreen
-      1 -> pictures ([firstRoom, userDisplay, debugDisplay] ++ gameOverOverlay) 
-      2 -> undefined
-      3 -> undefined
-      4 -> undefined 
+      1 -> pictures ([firstRoom, uiDisplay] ++ gameOverOverlay) 
+      2 -> pictures ([firstRoomMini, secondRoomMini, fillerDouble, uiDisplay] ++ gameOverOverlay)
+      3 -> pictures ([firstRoomMini, secondRoomMini, thirdRoomMini, fillerSingle, uiDisplay] ++ gameOverOverlay)
+      4 -> pictures ([firstRoomMini, secondRoomMini, thirdRoomMini, fourthRoomMini, uiDisplay] ++ gameOverOverlay) 
+      _ -> outOfBoundsScreen
 
 render _ _ _ = displayErrorScreen
 

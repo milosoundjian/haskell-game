@@ -48,7 +48,7 @@ movedRoomState rs dir
     -- kill player if go into spikes, prevent them from moving if go into water
     case (newPos `elem` (waters rs), newPos `elem` (spikes rs)) of 
       (True, _) -> rs {charRot = directionAngleMap dir}
-      (False, True) ->  rs {character = newPos, charRot = directionAngleMap dir, rGameOver = True} 
+      (False, True) ->  rs {character = (-100, -100), charRot = directionAngleMap dir, rGameOver = True} 
       (False, False) ->  rs {character = newPos, charRot = directionAngleMap dir}
 
 
@@ -88,7 +88,7 @@ initialGameState :: GameState
 initialGameState =
   GameState
     { 
-      userText = "Lorem Ipsum",
+      userText = "Level 0 : Getting Started !",
       debugText = "Debug output :",
       isCursorVisible = True,
       randomStdGen = mkStdGen 100,
@@ -97,7 +97,7 @@ initialGameState =
       levelIndex = 0,
       gameOver = False,
 
-      rooms = [debugRoom],
+      rooms = [debugRoom, debugRoom, debugRoom, debugRoom],
       moveHistory = []
     }
 
@@ -106,7 +106,7 @@ debugRoom :: RoomState
 debugRoom = 
     RoomState 
     {
-        character = (10, 10),
+        character = (0, 0),
         charRot = 0,
 
         waters = [(2, 3), (3, 3), (3, 4), (10, 4)],
@@ -119,5 +119,6 @@ debugRoom =
     }
 
 -- combine all of the levels written above
+type Name = String
 levelsData :: [GameState]
 levelsData = [initialGameState]

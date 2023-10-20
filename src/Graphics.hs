@@ -36,11 +36,31 @@ spriteCell (x, y) rotation (Sprite{picture=pic, dimensions=(w, h)}) =
 
 
 -- all of the pictures that only need to be computed once 
+userTextBackdrop :: Picture
+userTextBackdrop =  color (makeColor 0 0 0 0.5) $
+                    translate 0 (-gameHeight/2) (rectangleSolid (gameWidth) 220)
+
+
 grid :: Picture
-grid = pictures (verticalLines ++ horizontalLines)
+grid = pictures (verticalLines ++ horizontalLines ++ vertBorder ++ horBorder)
   where
-    verticalLines = [Line [(x, -gameHeight / 2), (x, gameHeight / 2)] | x <- [-gameWidth / 2, -gameWidth / 2 + cellSize .. gameWidth / 2]]
-    horizontalLines = [Line [(-gameWidth / 2, y), (gameWidth / 2, y)] | y <- [-gameHeight / 2, -gameHeight / 2 + cellSize .. gameHeight / 2]]
+    borderThickness = 6 
+    vertBorder = color (makeColorI 139 69 19 255) <$> 
+                    [Polygon [(x - borderThickness/2, -gameHeight/2), (x + borderThickness/2, -gameHeight/2),
+                              (x + borderThickness/2, gameHeight/2), (x - borderThickness/2, gameHeight/2)] 
+                    | x <- [-gameWidth/2, gameWidth/2]]
+
+    horBorder = color (makeColorI 139 69 19 255) <$> 
+                    [Polygon [(-gameWidth/2, y - borderThickness/2), (gameWidth/2, y- borderThickness/2),
+                              (gameWidth/2, y + borderThickness/2), (-gameWidth/2, y + borderThickness/2)] 
+                    | y <- [-gameHeight/2, gameHeight/2]]
+
+
+    verticalLines = [Line [(x, -gameHeight / 2), (x, gameHeight / 2)] | 
+                          x <- [-gameWidth/2 + cellSize, -gameWidth/2 + 2*cellSize .. gameWidth / 2 - cellSize]]
+
+    horizontalLines = [Line [(-gameWidth / 2, y), (gameWidth / 2, y)] | 
+                          y <- [-gameHeight/2 + cellSize, -gameHeight/2 + 2*cellSize .. gameHeight / 2 - cellSize]]
 
 textOnScreen :: String -> Float -> Color -> Color -> Picture
 textOnScreen textString textWidth textCol backCol =
