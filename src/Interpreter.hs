@@ -108,8 +108,8 @@ interpret input gs =
             [OP MOVE, Prep TO, Pos newPos] -> 
                     gs {rooms = map (`movedToRoomState` newPos) (rooms gs)  }   
 
-            [OP ADD, Name "box", Prep AT, Pos newPos] ->
-                    gs {rooms = map (`addBox` newPos) (rooms gs)}
+            [OP ADD, Name "spike", Prep AT, Pos newPos] ->
+                    gs {rooms = map (`addSpike` newPos) (rooms gs)}
             
             [OP ADD, Name "water", Prep AT, Pos newPos] ->
                     gs {rooms = map (`addWater` newPos) (rooms gs)}

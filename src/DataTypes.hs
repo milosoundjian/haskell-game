@@ -19,16 +19,14 @@ type Character = Position
 
 data Direction = UP | DOWN | LEFT | RIGHT deriving (Eq, Ord, Enum)
 
-type Boxes = [Position]
-type Waters = [Position]
 
 data RoomState = RoomState
   {
       character :: Character,
       charRot :: Float, -- character rotation
 
-      waters :: Waters,
-      boxes :: Boxes,
+      waters :: [Position],
+      spikes :: [Position],
 
       isTerminal :: Bool,
       specialPos :: Position,
