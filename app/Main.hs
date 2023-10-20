@@ -118,10 +118,10 @@ handleKeys :: Event -> GameState -> GameState
 
 -- player movement
 handleKeys (EventKey (SpecialKey key) Down _ _) gameState
-  | key == KeyLeft = movedGameState gameState LEFT
-  | key == KeyRight = movedGameState gameState RIGHT
-  | key == KeyUp = movedGameState gameState UP
-  | key == KeyDown = movedGameState gameState DOWN
+  | key == leftInput = movedGameState gameState LEFT
+  | key == rightInput = movedGameState gameState RIGHT
+  | key == upInput = movedGameState gameState UP
+  | key == downInput = movedGameState gameState DOWN
 
 
 -- removing characters from user input
@@ -151,18 +151,22 @@ handleKeys (EventKey (SpecialKey KeySpace) Down _ _) gs =
 
 
 --shortcut to clear the text input
-handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs = 
+handleKeys (EventKey (SpecialKey clearTextInput) Down _ _ ) gs = 
   gs {
     userText = ""
   }
 
 -- send input for processing
-handleKeys (EventKey (SpecialKey KeyEnter) Down _ _) gs = 
+handleKeys (EventKey (SpecialKey submitTextInput) Down _ _) gs = 
   (interpret (userText gs) gs) {userText = ""}
   
--- Right shift undoes the last action
-handleKeys (EventKey (SpecialKey KeyShiftR) Down _ _) gs = 
+-- revert to previous gamestate
+handleKeys (EventKey (SpecialKey undoInput) Down _ _) gs = 
   undoLastMove gs
+
+-- reset the current level
+handleKeys (EventKey (SpecialKey resetInput) Down _ _) gs = 
+  restartLevel gs
 
 handleKeys _ gameState = gameState
 

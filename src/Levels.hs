@@ -67,6 +67,10 @@ undoLastMove :: GameState -> GameState
 undoLastMove gs 
   | (length $ moveHistory gs) == 0 = gs
   | otherwise = head $ moveHistory gs 
+
+-- reloads the level at the current level id 
+restartLevel :: GameState -> GameState
+restartLevel gs = gs
     
 
 addSpike :: RoomState -> Position -> RoomState
@@ -97,7 +101,7 @@ initialGameState =
       levelIndex = 0,
       gameOver = False,
 
-      rooms = [debugRoom, debugRoom, debugRoom, debugRoom],
+      rooms = [debugRoom],
       moveHistory = []
     }
 
@@ -109,11 +113,11 @@ debugRoom =
         character = (0, 0),
         charRot = 0,
 
-        waters = [(2, 3), (3, 3), (3, 4), (10, 4)],
+        waters = [(2, 3), (3, 3), (3, 4)],
         spikes = [(0, 5), (7, 4)],
 
         isTerminal = True,
-        specialPos = (15, 10),
+        specialPos = (5, 5),
 
         rGameOver = False
     }
