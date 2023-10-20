@@ -139,9 +139,13 @@ handleKeys (EventKey (SpecialKey KeyEnd) Down _ _ ) gs =
     userText = ""
   }
 
+-- send input for processing
 handleKeys (EventKey (SpecialKey KeyEnter) Down _ _) gs = 
   (interpret (userText gs) gs) {userText = ""}
   
+-- Right shift undoes the last action
+handleKeys (EventKey (SpecialKey KeyShiftR) Down _ _) gs = 
+  undoLastMove gs
 
 handleKeys _ gameState = gameState
 

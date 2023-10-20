@@ -9,6 +9,10 @@ import DataTypes
 
 
 --Helper FUNCTIONS
+--stores a copy of the current state in the move history list 
+backup :: GameState -> GameState 
+backup gs = gs {moveHistory = gs:(moveHistory gs)}
+
 -- (ignores illegal moves)
 move :: Character -> Direction -> Character
 move (charX, charY) direction =
@@ -44,15 +48,26 @@ movedRoomState rs dir
     -- kill player if go into water, prevent them from moving if go into box
     case (newPos `elem` (boxes rs), newPos `elem` (waters rs)  ) of 
       (True, _) -> rs {charRot = directionAngleMap dir}
-      (False, True) -> rs {character = newPos, charRot = directionAngleMap dir, rGameOver = True} 
-      (False, False) -> rs {character = newPos, charRot = directionAngleMap dir}
+      (False, True) ->  rs {character = newPos, charRot = directionAngleMap dir, rGameOver = True} 
+      (False, False) ->  rs {character = newPos, charRot = directionAngleMap dir}
 
 
 movedGameState :: GameState -> Direction -> GameState
 movedGameState gs dir 
   -- use short-circuiting
-  | (gameOver gs || any (rGameOver) (rooms gs)) = gs {gameOver = True}
-  | otherwise = gs {rooms = map (`movedRoomState` dir) (rooms gs) }
+  | (gameOver gs || any (rGameOver) (rooms gs)) = 
+      gs {gameOver = True}
+      
+  | otherwise = 
+      (backup gs) {rooms = map (`movedRoomState` dir) (rooms gs) }
+
+
+-- reverts to the last saved state, doesn't do anything if the history is empty
+undoLastMove :: GameState -> GameState 
+undoLastMove gs 
+  | (length $ moveHistory gs) == 0 = gs
+  | otherwise = head $ moveHistory gs 
+    
 
 addBox :: RoomState -> Position -> RoomState
 addBox rs addPos =
