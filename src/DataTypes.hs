@@ -32,7 +32,7 @@ data RoomState = RoomState
       specialPos :: Position,
 
       rGameOver :: Bool
-  }
+  } deriving Eq
 
 
 
@@ -44,8 +44,8 @@ data GameState = GameState {
 
   -- game flow related stuff
   elapsedFrames :: Int,
-  gsIndex::Int,
   levelIndex :: Int,
+  screenIndex ::Int,
   gameOver :: Bool,
 
   -- gameplay related stuff
@@ -58,7 +58,7 @@ data GameState = GameState {
 data Sprite = Sprite {
   picture :: Picture,
   dimensions :: Dimensions
-}
+} deriving Eq
 
 
 directionVectorMap :: Direction -> (Int, Int)

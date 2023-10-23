@@ -198,7 +198,11 @@ main = do
   let window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) 
                (round xCentered, round yCentered)
 
+  -- load the first level in list 
+  let firstLevel = (fst $ head levelsData) {rooms = head $ snd $ head levelsData} 
+
+
 
   --load the first level in list
-  play window backgroundCol framerate (head $ head levelsData) 
+  play window backgroundCol framerate firstLevel
        (render backgroundP sprites) handleKeys update

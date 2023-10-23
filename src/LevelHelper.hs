@@ -64,8 +64,24 @@ movedGameState gs dir
       gs {gameOver = True}
       
   | otherwise = 
-      --call the movedRoom function and pass it the roomState + gameState
-      (backup gs) {rooms = map (`movedRoomState` dir) (rooms gs) }
+    let 
+      newGs = (backup gs) {rooms = map (`movedRoomState` dir) (rooms gs) }
+      collidingRooms = filter isSpecialCollision (rooms newGs)
+      terminalCollisions = filter isTerminal collidingRooms 
+    in
+      if (collidingRooms /= []) then 
+        if (terminalCollisions == []) then 
+          --puzzle has been solved, go to next screen
+          nextGameState newGs
+        else 
+          --destroy all the rooms that have reached their goal
+          newGs {rooms = filter (not . (`elem` terminalCollisions)) (rooms newGs)}
+      else 
+        -- just return the normally moved state 
+        newGs
+
+
+
 
 
 -- reverts to the last saved state, doesn't do anything if the history is empty
@@ -76,29 +92,44 @@ undoLastMove gs
 
 -- reloads the level at the current level id 
 restartLevel :: GameState -> GameState
-restartLevel curGs@(GameState{levelIndex = li, gsIndex = gi})
+restartLevel curGs@(GameState{levelIndex = li, screenIndex = si})
   --using short circuiting
-  | (
-    li < (length levelsData) 
-  && gi < (length (levelsData !! li)) 
-  ) = 
-      (levelsData !! li) !! gi
+  | 
+     li < length levelsData
+  && si < length ( snd (levelsData !! li) )
+   = 
+      curGs {
+        rooms = snd (levelsData !! li) !! si,
+        gameOver = False,
+        moveHistory = []
+      }
 
   | otherwise =  curGs
 
---assumes there exists a next game state in cur level, otherwise returns the OoB scene
+
+-- moves player to the next screen of current level
+-- currently doesn't implement level transition
 nextGameState :: GameState -> GameState
-nextGameState curGs@(GameState {levelIndex = li, gsIndex = gi})
-  -- short circuiting, WOW, epic doge, wholesome 100, you'r breathtaking
-  | (
-    li < (length levelsData) 
-  && gi < (length (levelsData !! li) - 1) 
-  ) = 
-      (levelsData !! li) !! (gi + 1)
+nextGameState curGs@(GameState {levelIndex = li, screenIndex = si})
+  -- wholesome 100 short circuiting
+  | 
+     li < length levelsData
+  && si < length ( snd (levelsData !! li)) - 1 
+   = 
+      curGs {
+        rooms = (snd (levelsData !! li)) !! (si + 1),
+        screenIndex = si + 1,
+        moveHistory = []
+      }
 
   | otherwise =  curGs
-    
 
+--check whether a room has a squirrel-special object collision
+isSpecialCollision :: RoomState -> Bool
+isSpecialCollision RoomState {character=char, specialPos = special} = 
+  (char == special)
+
+-- utility functions to add entities at runtime
 addSpike :: RoomState -> Position -> RoomState
 addSpike rs addPos =
   if (elem addPos (spikes rs)) then 
