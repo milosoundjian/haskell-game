@@ -17,14 +17,15 @@ downInput :: SpecialKey
 rightInput :: SpecialKey 
 leftInput :: SpecialKey 
 undoInput :: SpecialKey
+-- etc... all of them must be special key constructors
 
 upInput = KeyUp
 downInput = KeyDown
 rightInput = KeyRight
 leftInput = KeyLeft
 
-undoInput = KeyShiftR
-resetInput = KeyTab
+undoInput = KeyAltL
+resetInput = KeyShiftR
 
 submitTextInput = KeyEnter
 clearTextInput = KeyDelete

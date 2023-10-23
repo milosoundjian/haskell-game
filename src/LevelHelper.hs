@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Levels where
+module LevelHelper where
 
 import System.Random
 
