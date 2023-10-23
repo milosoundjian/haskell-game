@@ -41,7 +41,6 @@ data GameState = GameState {
   userText :: String,
   debugText :: String,
   isCursorVisible :: Bool,
-  randomStdGen :: StdGen,
 
   -- game flow related stuff
   elapsedFrames :: Int,

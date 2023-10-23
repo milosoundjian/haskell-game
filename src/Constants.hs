@@ -24,8 +24,8 @@ downInput = KeyDown
 rightInput = KeyRight
 leftInput = KeyLeft
 
-undoInput = KeyAltL
-resetInput = KeyShiftR
+undoInput = KeyShiftL
+resetInput = KeyCtrlL
 
 submitTextInput = KeyEnter
 clearTextInput = KeyDelete
