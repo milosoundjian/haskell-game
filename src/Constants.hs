@@ -55,7 +55,7 @@ framerate = 20
 
 
 backgroundCol :: Color
-backgroundCol = white
+backgroundCol = black
 
 cursorFlickerDuration :: Int
 cursorFlickerDuration = 5

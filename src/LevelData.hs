@@ -29,13 +29,21 @@ room0A :: RoomState
 room0A = 
     roomBase 
     {
-        character = (0, 0),
+        character = (0, 5),
+        charRot = 0,
 
-        waters = [(2, 3), (3, 3), (3, 4)],
-        spikes = [(0, 5), (7, 4)],
+        waters = [
+            (0, 1), (0, 2), (1, 1), (1, 0), 
+            (2, 0), (3, 0), (4, 0), (5, 0),
+            (5, 1), (6, 1), (6, 2), (7, 3), 
+            (6, 4), (5, 4), (4, 4), (4, 3), 
+            (2, 4), (2, 5), (1, 5), (3, 3),
+            (2, 3)
+            ],
+        spikes = [],
 
         isTerminal = False,
-        specialPos = (5, 5)
+        specialPos = (6, 3)
     }
 
 room0B = 
@@ -43,7 +51,7 @@ room0B =
     {
         character = (5, 5),
 
-        waters = [(x, 3) | x <- [0..cols-1]],
+        waters = [(x, 3) | x <- [0..cols-1], x /= 1],
 
         isTerminal = True,
         specialPos = (0, 0) 
@@ -79,7 +87,7 @@ levelZero = (
     --succession of "screens" == "lists of roomstates"
     [
         [room0A],
-        [room0B, room0B, room0B]
+        [room0A{isTerminal = True}, room0B]
     ]
 
     )
