@@ -45,7 +45,7 @@ renderRoom backgroundP sprites@(squirrelS:spikeS:waterS:_) roomState =
     pictures ([backgroundP, grid, player, specialP] ++ watersP ++ spikesP)
 
 -- fallback in case one of the sprites arguments wasn't passed in 
-renderRoom _ _ _ = grid 
+renderRoom _ _ _ = displayErrorScreen 
 
 
 -- display each game room at the proper position

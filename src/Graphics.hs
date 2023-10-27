@@ -88,7 +88,7 @@ textOnScreen textString textWidth textCol backCol =
         pictures [bg, txt]
 
 gameOverScreen :: Picture
-gameOverScreen = textOnScreen "YOU DIED" 633 red (withAlpha 0.3 black)
+gameOverScreen = textOnScreen "YOU DIED" 633 red (withAlpha 0.5 black)
 
 outOfBoundsScreen :: Picture
 outOfBoundsScreen = textOnScreen "HOW?" 352 black white

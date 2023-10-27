@@ -97,7 +97,21 @@ levelZero = (
 
     )
 
+levelOne :: Level
+levelOne = (
+
+    gsBase 
+    {
+        userText = "Level 1 : Binary Bifurcation Branch",
+        levelIndex = 1
+    },
+
+    [
+        [room0A]
+    ]
+
+    )
 
 -- Combining everythings
 levelsData:: LevelData
-levelsData = [levelZero]
+levelsData = [levelZero, levelOne]

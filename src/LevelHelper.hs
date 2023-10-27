@@ -70,11 +70,11 @@ movedGameState gs dir
       terminalCollisions = filter isTerminal collidingRooms 
     in
       if (collidingRooms /= []) then 
-        if (terminalCollisions == []) then 
+        if (terminalCollisions == []) || length (rooms newGs) == 1  then 
           --puzzle has been solved, go to next screen
           nextGameState newGs
         else 
-          --destroy all the rooms that have reached their goal
+          --remove all the side rooms that reached their terminal goal
           newGs {rooms = filter (not . (`elem` terminalCollisions)) (rooms newGs)}
       else 
         -- just return the normally moved state 
@@ -111,15 +111,21 @@ restartLevel curGs@(GameState{levelIndex = li, screenIndex = si})
 -- currently doesn't implement level transition
 nextGameState :: GameState -> GameState
 nextGameState curGs@(GameState {levelIndex = li, screenIndex = si})
-  -- wholesome 100 short circuiting
-  | 
-     li < length levelsData
-  && si < length ( snd (levelsData !! li)) - 1 
-   = 
+
+  | si < length ( snd $ levelsData !! li) - 1 
+      =  
       curGs {
-        rooms = (snd (levelsData !! li)) !! (si + 1),
+        rooms = (snd $ levelsData !! li) !! (si + 1),
         screenIndex = si + 1,
         moveHistory = []
+      }
+
+  -- wholesome 100 short circuiting
+  |  li < (length levelsData - 1)
+  && si == length ( snd $ levelsData !! li ) - 1
+      =
+      (fst $ levelsData !! (li + 1)) {
+        rooms = head $ snd $ levelsData !! (li + 1)
       }
 
   | otherwise =  curGs
