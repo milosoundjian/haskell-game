@@ -28,6 +28,7 @@ data RoomState = RoomState
       waters :: [Position],
       spikes :: [Position],
 
+      isMini :: Bool, -- mini rooms have their tile size halved
       isTerminal :: Bool,
       specialPos :: Position,
 

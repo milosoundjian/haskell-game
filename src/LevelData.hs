@@ -15,8 +15,11 @@ roomBase =
     {
         character = (0, 0),
         charRot = 180,
+
         waters = [],
         spikes = [],
+
+        isMini = False,
         isTerminal = False,
         specialPos = (cols -1, rows - 1),
         rGameOver = False
@@ -46,15 +49,18 @@ room0A =
         specialPos = (6, 3)
     }
 
+
 room0B = 
     roomBase
     {
-        character = (5, 5),
+        character = (0, 1),
+        charRot = -90,
 
-        waters = [(x, 3) | x <- [0..cols-1], x /= 1],
+        spikes = [(1, 0), (2, 0), (3, 0), (1, 2), (2, 2), (3, 2)],
 
+        isMini = True,
         isTerminal = True,
-        specialPos = (0, 0) 
+        specialPos = (3, 1) 
     }
 
 --eidolon game state 
@@ -86,8 +92,7 @@ levelZero = (
 
     --succession of "screens" == "lists of roomstates"
     [
-        [room0A],
-        [room0A{isTerminal = True}, room0B]
+        [room0B]
     ]
 
     )

@@ -34,6 +34,8 @@ clearTextInput = KeyDelete
 
 --  GAME CONSTANTS start here :
 -- screen dimensions are float to reduce number of type casts in computation
+-- Rows and Columns MUST BE divisible by 2 
+-- or the program isn't guaranteed to work
 rows :: Int
 rows = 6
 
