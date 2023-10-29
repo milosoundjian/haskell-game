@@ -70,7 +70,7 @@ movedGameState gs dir
 -- reverts to the last saved state, doesn't do anything if the history is empty
 undoLastMove :: GameState -> GameState 
 undoLastMove gs 
-  | (length $ moveHistory gs) == 0 = gs
+  | (null $ moveHistory gs) = gs
   | otherwise = head $ moveHistory gs 
 
 -- reloads the level at the current level id 
