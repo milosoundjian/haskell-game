@@ -29,7 +29,8 @@ library
       DataTypes
       Graphics
       Interpreter
-      Levels
+      LevelHelper
+      LevelData
   other-modules:
       Paths_haskell_game
   autogen-modules:

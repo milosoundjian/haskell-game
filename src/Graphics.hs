@@ -41,10 +41,10 @@ userTextBackdrop =  color (makeColor 0 0 0 0.5) $
                     translate 0 (-gameHeight/2) (rectangleSolid (gameWidth) 220)
 
 
-grid :: Picture
-grid = pictures (verticalLines ++ horizontalLines ++ vertBorder ++ horBorder)
+makeGrid :: Float -> Float -> Picture
+makeGrid borderThickness tileSize = 
+  pictures (verticalLines ++ horizontalLines ++ vertBorder ++ horBorder)
   where
-    borderThickness = 6 
     vertBorder = color (makeColorI 139 69 19 255) <$> 
                     [Polygon [(x - borderThickness/2, -gameHeight/2), (x + borderThickness/2, -gameHeight/2),
                               (x + borderThickness/2, gameHeight/2), (x - borderThickness/2, gameHeight/2)] 
@@ -57,10 +57,18 @@ grid = pictures (verticalLines ++ horizontalLines ++ vertBorder ++ horBorder)
 
 
     verticalLines = [Line [(x, -gameHeight / 2), (x, gameHeight / 2)] | 
-                          x <- [-gameWidth/2 + cellSize, -gameWidth/2 + 2*cellSize .. gameWidth / 2 - cellSize]]
+                          x <- [-gameWidth/2 + tileSize, -gameWidth/2 + 2*tileSize .. gameWidth / 2 - tileSize]]
 
     horizontalLines = [Line [(-gameWidth / 2, y), (gameWidth / 2, y)] | 
-                          y <- [-gameHeight/2 + cellSize, -gameHeight/2 + 2*cellSize .. gameHeight / 2 - cellSize]]
+                          y <- [-gameHeight/2 + tileSize, -gameHeight/2 + 2*tileSize .. gameHeight / 2 - tileSize]]
+
+--main (rows * cols) grid
+grid :: Picture
+grid = makeGrid 6.0 cellSize
+
+-- grid for halved "resolution" room
+miniGrid :: Picture
+miniGrid = makeGrid 6.0 (2*cellSize)
 
 textOnScreen :: String -> Float -> Color -> Color -> Picture
 textOnScreen textString textWidth textCol backCol =
@@ -80,7 +88,7 @@ textOnScreen textString textWidth textCol backCol =
         pictures [bg, txt]
 
 gameOverScreen :: Picture
-gameOverScreen = textOnScreen "YOU DIED" 633 red (withAlpha 0.3 black)
+gameOverScreen = textOnScreen "YOU DIED" 633 red (withAlpha 0.5 black)
 
 outOfBoundsScreen :: Picture
 outOfBoundsScreen = textOnScreen "HOW?" 352 black white

@@ -28,11 +28,12 @@ data RoomState = RoomState
       waters :: [Position],
       spikes :: [Position],
 
+      isMini :: Bool, -- mini rooms have their tile size halved
       isTerminal :: Bool,
       specialPos :: Position,
 
       rGameOver :: Bool
-  }
+  } deriving Eq
 
 
 
@@ -41,12 +42,11 @@ data GameState = GameState {
   userText :: String,
   debugText :: String,
   isCursorVisible :: Bool,
-  randomStdGen :: StdGen,
 
   -- game flow related stuff
   elapsedFrames :: Int,
-  gsIndex::Int,
   levelIndex :: Int,
+  screenIndex ::Int,
   gameOver :: Bool,
 
   -- gameplay related stuff
@@ -59,7 +59,7 @@ data GameState = GameState {
 data Sprite = Sprite {
   picture :: Picture,
   dimensions :: Dimensions
-}
+} deriving Eq
 
 
 directionVectorMap :: Direction -> (Int, Int)

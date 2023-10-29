@@ -17,14 +17,15 @@ downInput :: SpecialKey
 rightInput :: SpecialKey 
 leftInput :: SpecialKey 
 undoInput :: SpecialKey
+-- etc... all of them must be special key constructors
 
 upInput = KeyUp
 downInput = KeyDown
 rightInput = KeyRight
 leftInput = KeyLeft
 
-undoInput = KeyShiftR
-resetInput = KeyTab
+undoInput = KeyShiftL
+resetInput = KeyCtrlL
 
 submitTextInput = KeyEnter
 clearTextInput = KeyDelete
@@ -33,6 +34,8 @@ clearTextInput = KeyDelete
 
 --  GAME CONSTANTS start here :
 -- screen dimensions are float to reduce number of type casts in computation
+-- Rows and Columns MUST BE divisible by 2 
+-- or the program isn't guaranteed to work
 rows :: Int
 rows = 6
 
@@ -54,7 +57,7 @@ framerate = 20
 
 
 backgroundCol :: Color
-backgroundCol = white
+backgroundCol = black
 
 cursorFlickerDuration :: Int
 cursorFlickerDuration = 5

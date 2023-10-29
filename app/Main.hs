@@ -10,9 +10,11 @@ import Graphics.Gloss.Interface.Environment
 --internal imports
 import DataTypes
 import Constants
-import Levels
+import LevelHelper
+import LevelData
 import Interpreter
 import Graphics
+
 
 
 
@@ -43,7 +45,7 @@ renderRoom backgroundP sprites@(squirrelS:spikeS:waterS:_) roomState =
     pictures ([backgroundP, grid, player, specialP] ++ watersP ++ spikesP)
 
 -- fallback in case one of the sprites arguments wasn't passed in 
-renderRoom _ _ _ = grid 
+renderRoom _ _ _ = displayErrorScreen 
 
 
 -- display each game room at the proper position
@@ -124,19 +126,25 @@ update seconds gameState =
 
 handleKeys :: Event -> GameState -> GameState
 
--- player movement
+
+
+-- HANDLE all special characters in one BIG boolean guard
 handleKeys (EventKey (SpecialKey key) Down _ _) gameState
+
   | key == leftInput = movedGameState gameState LEFT
   | key == rightInput = movedGameState gameState RIGHT
   | key == upInput = movedGameState gameState UP
   | key == downInput = movedGameState gameState DOWN
 
+  | key == undoInput = undoLastMove gameState
+  | key == resetInput = restartLevel gameState
+
+  | key == clearTextInput = gameState {userText = ""}
+  | key == submitTextInput = (interpret (userText gameState) gameState) {userText = ""}
+
+
 
 -- removing characters from user input
-handleKeys (EventKey (SpecialKey KeyDelete) Down _ _) gs
-  | [] <- userText gs = gs
-  | otherwise = gs { userText = init (userText gs) }
-
 handleKeys (EventKey (Char '\b') Down _ _) gs
   | [] <- userText gs = gs
   | otherwise = gs { userText = init (userText gs) }
@@ -155,28 +163,10 @@ handleKeys (EventKey (SpecialKey KeySpace) Down _ _) gs =
     userText = userText gs ++ " "
   }
 
+--catch all for unused inputs
+handleKeys _ gs = gs
 
 
-
---shortcut to clear the text input
-handleKeys (EventKey (SpecialKey clearTextInput) Down _ _ ) gs = 
-  gs {
-    userText = ""
-  }
-
--- send input for processing
-handleKeys (EventKey (SpecialKey submitTextInput) Down _ _) gs = 
-  (interpret (userText gs) gs) {userText = ""}
-  
--- revert to previous gamestate
-handleKeys (EventKey (SpecialKey undoInput) Down _ _) gs = 
-  undoLastMove gs
-
--- reset the current level
-handleKeys (EventKey (SpecialKey resetInput) Down _ _) gs = 
-  restartLevel gs
-
-handleKeys _ gameState = gameState
 
 main :: IO ()
 main = do
@@ -208,7 +198,11 @@ main = do
   let window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) 
                (round xCentered, round yCentered)
 
+  -- load the first level in list 
+  let firstLevel = (fst $ head levelsData) {rooms = head $ snd $ head levelsData} 
+
+
 
   --load the first level in list
-  play window backgroundCol framerate (head $ head levelsData) 
+  play window backgroundCol framerate firstLevel
        (render backgroundP sprites) handleKeys update

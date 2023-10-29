@@ -5,7 +5,7 @@ import Data.Char
 import Graphics.Gloss
 
 import DataTypes
-import Levels
+import LevelHelper
 
 -- This is the file that will interpret user commands
 

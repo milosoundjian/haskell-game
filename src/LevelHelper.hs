@@ -1,11 +1,12 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Levels where
+module LevelHelper where
 
 import System.Random
 
 import Constants
 import DataTypes
 import Graphics
+import LevelData
 
 
 
@@ -63,8 +64,24 @@ movedGameState gs dir
       gs {gameOver = True}
       
   | otherwise = 
-      --call the movedRoom function and pass it the roomState + gameState
-      (backup gs) {rooms = map (`movedRoomState` dir) (rooms gs) }
+    let 
+      newGs = (backup gs) {rooms = map (`movedRoomState` dir) (rooms gs) }
+      collidingRooms = filter isSpecialCollision (rooms newGs)
+      terminalCollisions = filter isTerminal collidingRooms 
+    in
+      if (collidingRooms /= []) then 
+        if (terminalCollisions == []) || length (rooms newGs) == 1  then 
+          --puzzle has been solved, go to next screen
+          nextGameState newGs
+        else 
+          --remove all the side rooms that reached their terminal goal
+          newGs {rooms = filter (not . (`elem` terminalCollisions)) (rooms newGs)}
+      else 
+        -- just return the normally moved state 
+        newGs
+
+
+
 
 
 -- reverts to the last saved state, doesn't do anything if the history is empty
@@ -75,29 +92,50 @@ undoLastMove gs
 
 -- reloads the level at the current level id 
 restartLevel :: GameState -> GameState
-restartLevel (GameState{levelIndex = li, gsIndex = gi})
+restartLevel curGs@(GameState{levelIndex = li, screenIndex = si})
   --using short circuiting
-  | (
-    li < (length levelsData) 
-  && gi < (length (levelsData !! li)) 
-  ) = 
-      (levelsData !! li) !! gi
+  | 
+     li < length levelsData
+  && si < length ( snd (levelsData !! li) )
+   = 
+      curGs {
+        rooms = snd (levelsData !! li) !! si,
+        gameOver = False,
+        moveHistory = []
+      }
 
-  | otherwise =  initialGameState
+  | otherwise =  curGs
 
---assumes there exists a next game state in cur level, otherwise returns the OoB scene
+
+-- moves player to the next screen of current level
+-- currently doesn't implement level transition
 nextGameState :: GameState -> GameState
-nextGameState (GameState {levelIndex = li, gsIndex = gi})
-  -- short circuiting, much wow, epic doggo, wholesome 100ù
-  | (
-    li < (length levelsData) 
-  && gi < (length (levelsData !! li) - 1) 
-  ) = 
-      (levelsData !! li) !! (gi + 1)
+nextGameState curGs@(GameState {levelIndex = li, screenIndex = si})
 
-  | otherwise =  initialGameState
-    
+  | si < length ( snd $ levelsData !! li) - 1 
+      =  
+      curGs {
+        rooms = (snd $ levelsData !! li) !! (si + 1),
+        screenIndex = si + 1,
+        moveHistory = []
+      }
 
+  -- wholesome 100 short circuiting
+  |  li < (length levelsData - 1)
+  && si == length ( snd $ levelsData !! li ) - 1
+      =
+      (fst $ levelsData !! (li + 1)) {
+        rooms = head $ snd $ levelsData !! (li + 1)
+      }
+
+  | otherwise =  curGs
+
+--check whether a room has a squirrel-special object collision
+isSpecialCollision :: RoomState -> Bool
+isSpecialCollision RoomState {character=char, specialPos = special} = 
+  (char == special)
+
+-- utility functions to add entities at runtime
 addSpike :: RoomState -> Position -> RoomState
 addSpike rs addPos =
   if (elem addPos (spikes rs)) then 
@@ -112,46 +150,3 @@ addWater rs addPos =
   else 
     rs {waters = addPos:(waters rs) } 
 
---THIS IS WHERE we define the actual level data for all of the 
-
-initialGameState :: GameState
-initialGameState =
-  GameState
-    { 
-      userText = "Level 0 : Getting Started !",
-      debugText = "Debug output :",
-      isCursorVisible = True,
-      randomStdGen = mkStdGen 100,
-
-      elapsedFrames = 0,
-      levelIndex = 0,
-      gsIndex = 0, -- index of the game state within the level
-      gameOver = False,
-
-      rooms = [debugRoom],
-      moveHistory = []
-    }
-
-
-debugRoom :: RoomState
-debugRoom = 
-    RoomState 
-    {
-        character = (0, 0),
-        charRot = 0,
-
-        waters = [(2, 3), (3, 3), (3, 4)],
-        spikes = [(0, 5), (7, 4)],
-
-        isTerminal = False,
-        specialPos = (5, 5),
-
-        rGameOver = False
-    }
-
--- combine all of the levels written above
-type Name = String
-type Level = [GameState]
-
-levelsData :: [Level]
-levelsData = [[initialGameState, initialGameState {gsIndex = 1, rooms = [debugRoom {isTerminal = True}, debugRoom{isTerminal = True}, debugRoom{isTerminal = True}]}]]
