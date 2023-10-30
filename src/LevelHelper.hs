@@ -8,6 +8,7 @@ import DataTypes
 import Graphics
 import LevelData
 
+import Zippers
 
 
 --Helper FUNCTIONS
@@ -87,48 +88,48 @@ movedGameState gs dir
 -- reverts to the last saved state, doesn't do anything if the history is empty
 undoLastMove :: GameState -> GameState 
 undoLastMove gs 
-  | (length $ moveHistory gs) == 0 = gs
-  | otherwise = head $ moveHistory gs 
+  | null (moveHistory gs) = gs
+  | otherwise = head $ moveHistory gs
+
+-- Initializes rooms from the screen pointer in the GameState provided
+initRooms :: GameState -> GameState
+initRooms gs@(GameState{screenPointer = sp}) = gs{rooms = screen $ value sp}
 
 -- reloads the level at the current level id 
 restartLevel :: GameState -> GameState
-restartLevel curGs@(GameState{levelIndex = li, screenIndex = si})
-  --using short circuiting
-  | 
-     li < length levelsData
-  && si < length ( snd (levelsData !! li) )
-   = 
-      curGs {
-        rooms = snd (levelsData !! li) !! si,
-        gameOver = False,
-        moveHistory = []
-      }
-
-  | otherwise =  curGs
+restartLevel curGs@(GameState{currLevelInitScreen = scr}) = initRooms curGs{
+  screenPointer = scr,      -- screenPointer will point to the screen at the start of the level
+  moveHistory = []        -- moveHistory will be emptied out
+}
 
 
 -- moves player to the next screen of current level
 -- currently doesn't implement level transition
-nextGameState :: GameState -> GameState
-nextGameState curGs@(GameState {levelIndex = li, screenIndex = si})
 
-  | si < length ( snd $ levelsData !! li) - 1 
-      =  
-      curGs {
-        rooms = (snd $ levelsData !! li) !! (si + 1),
-        screenIndex = si + 1,
+nextGameState :: GameState -> GameState
+nextGameState curGs@(GameState {currLevelInitScreen = clis, screenPointer = sp, titlePointer = tp})
+  | isLast sp = curGs
+  | otherwise = 
+    let 
+      newSp = movR sp
+      screenInfo = value newSp
+      
+      isNewLvl = isNewLevel screenInfo
+      newTp = if isNewLvl then movR tp else tp
+      
+      title = value newTp
+    in
+      initRooms curGs{
+        currLevelInitScreen = if isNewLvl then newSp else clis, 
+        screenPointer = newSp, 
+        
+        titlePointer = newTp, 
+        userText = title,
+        
         moveHistory = []
       }
-
-  -- wholesome 100 short circuiting
-  |  li < (length levelsData - 1)
-  && si == length ( snd $ levelsData !! li ) - 1
-      =
-      (fst $ levelsData !! (li + 1)) {
-        rooms = head $ snd $ levelsData !! (li + 1)
-      }
-
-  | otherwise =  curGs
+       
+      
 
 --check whether a room has a squirrel-special object collision
 isSpecialCollision :: RoomState -> Bool

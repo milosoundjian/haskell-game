@@ -7,6 +7,8 @@ import Graphics.Gloss
 
 import Constants
 
+import Zippers
+
 
 -- tuple of form (x, y)
 -- reminder : coordinates start at BOTTOM LEFT of the screen
@@ -16,6 +18,20 @@ type Position = (Int, Int)
 type Dimensions = (Int, Int)
 
 type Character = Position
+
+
+
+
+-- defining helper types 
+type Screen = [RoomState]
+type Title = String
+data ScreenWrap = ScreenWrap
+  {
+    screen :: Screen,
+    isNewLevel :: Bool
+  }
+-- type Level = (GameState, [Screen])
+type LevelData = [ScreenWrap]
 
 data Direction = UP | DOWN | LEFT | RIGHT deriving (Eq, Ord, Enum)
 
@@ -43,14 +59,19 @@ data GameState = GameState {
   debugText :: String,
   isCursorVisible :: Bool,
 
+  toInit :: Bool,   -- Need to initialize the rooms (from the screen pointed to by screenPointer) or not
+
   -- game flow related stuff
   elapsedFrames :: Int,
-  levelIndex :: Int,
-  screenIndex ::Int,
+  -- levelIndex :: Int,
+  -- screenIndex ::Int,
+  screenPointer :: ListZip ScreenWrap,
+  titlePointer :: ListZip Title,
   gameOver :: Bool,
+  currLevelInitScreen :: ListZip ScreenWrap,  -- pointer to screen at the start of current Level
 
   -- gameplay related stuff
-  rooms :: [RoomState],
+  rooms :: Screen,
   moveHistory :: [GameState]
 }
 

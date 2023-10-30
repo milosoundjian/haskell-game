@@ -97,7 +97,7 @@ displayErrorScreen :: Picture
 displayErrorScreen = textOnScreen "Render function error" 1369 red black
 
 nullScreen :: Picture 
-nullScreen = textOnScreen "0" 70 black white
+nullScreen = textOnScreen "1" 70 black white
 
 
 

@@ -3,10 +3,8 @@ module LevelData where
 import DataTypes
 import Constants
 
--- defining helper types 
-type Screen = [RoomState]
-type Level = (GameState, [Screen])
-type LevelData = [Level]
+import Zippers
+
 
 -- eidolon room (use as base for all room creations)
 roomBase :: RoomState 
@@ -50,6 +48,7 @@ room0A =
     }
 
 
+room0B :: RoomState
 room0B = 
     roomBase
     {
@@ -71,47 +70,69 @@ gsBase = GameState
         debugText = "Debug output :",
         isCursorVisible = True,
 
+        toInit = True,
+
+        currLevelInitScreen = headItem levelsData, 
+        screenPointer = headItem levelsData,
+        titlePointer = headItem titles,
+
         elapsedFrames = 0,
-        levelIndex = 0, 
-        screenIndex = 0,
         gameOver = False,
         rooms = [],
         moveHistory = []
     }
 
 
+
+
 -- HERE is where we define the actual levels using the rooms above
-levelZero :: Level
-levelZero = (
-    --starting gs of the level
-    gsBase
-    { 
-      userText = "Level 0 : Getting Started !",
-      levelIndex = 0
-    },
+-- levelZero :: Level
+-- levelZero = (
+--     --starting gs of the level
+--     gsBase
+--     { 
+--       userText = "Level 0 : Getting Started !",
+--       levelIndex = 0
+--     },
 
-    --succession of "screens" == "lists of roomstates"
-    [
-        [room0B]
-    ]
+--     --succession of "screens" == "lists of roomstates"
+--     [
+--         [room0B]
+--     ]
 
-    )
+--     )
 
-levelOne :: Level
-levelOne = (
+screenZero :: ScreenWrap
+screenZero = ScreenWrap{
+    screen = [room0B],
+    isNewLevel = True
+}
 
-    gsBase 
-    {
-        userText = "Level 1 : Binary Bifurcation Branch",
-        levelIndex = 1
-    },
 
-    [
-        [room0A]
-    ]
+-- levelOne :: Level
+-- levelOne = (
 
-    )
+--     gsBase 
+--     {
+--         userText = "Level 1 : Binary Bifurcation Branch",
+--         levelIndex = 1
+--     },
 
--- Combining everythings
+--     [
+--         [room0A]
+--     ]
+
+--     )
+
+screenOne :: ScreenWrap
+screenOne = ScreenWrap{
+    screen = [room0A],
+    isNewLevel = True
+}
+
+-- Combining everything
 levelsData:: LevelData
-levelsData = [levelZero, levelOne]
+levelsData = [screenZero, screenOne]
+
+titles :: [Title]
+titles = ["Level 0", "Level 1 : Binary Bifurcation Branch"]

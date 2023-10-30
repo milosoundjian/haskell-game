@@ -166,8 +166,6 @@ handleKeys (EventKey (SpecialKey KeySpace) Down _ _) gs =
 --catch all for unused inputs
 handleKeys _ gs = gs
 
-
-
 main :: IO ()
 main = do
   -- load the assets for the render function
@@ -199,10 +197,9 @@ main = do
                (round xCentered, round yCentered)
 
   -- load the first level in list 
-  let firstLevel = (fst $ head levelsData) {rooms = head $ snd $ head levelsData} 
-
-
+  -- let firstLevel = (fst $ head levelsData) {rooms = head $ snd $ head levelsData} 
+  let initialState = initRooms gsBase
 
   --load the first level in list
-  play window backgroundCol framerate firstLevel
+  play window backgroundCol framerate initialState
        (render backgroundP sprites) handleKeys update
