@@ -5,7 +5,6 @@ import Constants
 
 import Zippers
 
-
 -- eidolon room (use as base for all room creations)
 roomBase :: RoomState 
 roomBase = 
@@ -66,7 +65,7 @@ room0B =
 gsBase :: GameState
 gsBase = GameState 
     {
-        userText = "Level X",
+        userText = "",
         debugText = "Debug output :",
         isCursorVisible = True,
 
@@ -83,49 +82,25 @@ gsBase = GameState
     }
 
 
+-- ScreenWrap eidolon
+screenEidolon :: ScreenWrap
+screenEidolon = ScreenWrap{
+    screen = [],
+    isNewLevel = False
+}
 
-
--- HERE is where we define the actual levels using the rooms above
--- levelZero :: Level
--- levelZero = (
---     --starting gs of the level
---     gsBase
---     { 
---       userText = "Level 0 : Getting Started !",
---       levelIndex = 0
---     },
-
---     --succession of "screens" == "lists of roomstates"
---     [
---         [room0B]
---     ]
-
---     )
+-- HERE is where we define the actual levels using the rooms above.
+-- Just define a succession of screens as follows and mark each new level by a True in the wrapper
 
 screenZero :: ScreenWrap
-screenZero = ScreenWrap{
+screenZero = screenEidolon{
     screen = [room0B],
     isNewLevel = True
 }
 
 
--- levelOne :: Level
--- levelOne = (
-
---     gsBase 
---     {
---         userText = "Level 1 : Binary Bifurcation Branch",
---         levelIndex = 1
---     },
-
---     [
---         [room0A]
---     ]
-
---     )
-
 screenOne :: ScreenWrap
-screenOne = ScreenWrap{
+screenOne = screenEidolon{
     screen = [room0A],
     isNewLevel = True
 }

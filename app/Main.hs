@@ -198,6 +198,7 @@ main = do
 
   -- load the first level in list 
   -- let firstLevel = (fst $ head levelsData) {rooms = head $ snd $ head levelsData} 
+  
   let initialState = initRooms gsBase
 
   --load the first level in list

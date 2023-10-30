@@ -91,9 +91,9 @@ undoLastMove gs
   | null (moveHistory gs) = gs
   | otherwise = head $ moveHistory gs
 
--- Initializes rooms from the screen pointer in the GameState provided
+-- Initializes rooms and title from the screen pointer in the GameState provided
 initRooms :: GameState -> GameState
-initRooms gs@(GameState{screenPointer = sp}) = gs{rooms = screen $ value sp}
+initRooms gs@(GameState{titlePointer = tp, screenPointer = sp}) = gs{userText = value tp, rooms = screen $ value sp}
 
 -- reloads the level at the current level id 
 restartLevel :: GameState -> GameState
@@ -108,24 +108,21 @@ restartLevel curGs@(GameState{currLevelInitScreen = scr}) = initRooms curGs{
 
 nextGameState :: GameState -> GameState
 nextGameState curGs@(GameState {currLevelInitScreen = clis, screenPointer = sp, titlePointer = tp})
-  | isLast sp = curGs
+  | isLast sp = curGs   -- no more to load
   | otherwise = 
     let 
-      newSp = movR sp
+      newSp = movR sp   -- increment pointer
       screenInfo = value newSp
       
-      isNewLvl = isNewLevel screenInfo
-      newTp = if isNewLvl then movR tp else tp
-      
-      title = value newTp
+      isNewLvl = isNewLevel screenInfo    
+      newTp = if isNewLvl then movR tp else tp    -- change title if new level
+    
     in
       initRooms curGs{
         currLevelInitScreen = if isNewLvl then newSp else clis, 
         screenPointer = newSp, 
         
         titlePointer = newTp, 
-        userText = title,
-        
         moveHistory = []
       }
        
