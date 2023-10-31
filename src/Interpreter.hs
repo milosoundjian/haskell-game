@@ -107,7 +107,7 @@ interpret input gs =
                     gs {isDancing = False}
 
             [W "die"] ->
-                    gs {gameOver = True}
+                    (backup gs) {gameOver = True}
 
             _ -> gs {debugText = "Command not recognized: " ++ (show $ mergePass. wordPass. preprocess $ input)}
 

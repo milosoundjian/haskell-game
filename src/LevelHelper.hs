@@ -104,6 +104,7 @@ initRooms gs@(GameState{titlePointer = tp, screenPointer = sp}) = gs{userText = 
 restartLevel :: GameState -> GameState
 restartLevel curGs@(GameState{currLevelInitScreen = scr}) = initRooms curGs{
   screenPointer = scr,      -- screenPointer will point to the screen at the start of the level
+  gameOver = False,
   moveHistory = []        -- moveHistory will be emptied out
 }
 
