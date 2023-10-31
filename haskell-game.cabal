@@ -31,6 +31,8 @@ library
       Interpreter
       LevelData
       LevelHelper
+      Zippers
+
   other-modules:
       Paths_haskell_game
   autogen-modules:

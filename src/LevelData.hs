@@ -3,17 +3,14 @@ module LevelData where
 import DataTypes
 import Constants
 
--- defining helper types 
-type Screen = [RoomState]
-type Level = (GameState, [Screen])
-type LevelData = [Level]
+import Zippers
 
 -- eidolon room (use as base for all room creations)
 roomBase :: RoomState 
 roomBase = 
     RoomState 
     {
-        character = (0, 0),
+        character = (-100, -100),
         charRot = 180,
 
         waters = [],
@@ -21,13 +18,24 @@ roomBase =
 
         isMini = False,
         isTerminal = False,
-        specialPos = (cols -1, rows - 1),
+        specialPos = (-200, -200),
         rGameOver = False
     } 
 
 -- DEFINIING ROOMS HERE
 -- ideally each room should have a name of the form
--- roomID where ID = (roomLevelNumber)([A..Z]*)
+-- room[ID] where [ID] = (roomLevelNumber)([A..Z]*)
+-- only exception is roomDebug 
+roomDebug :: RoomState
+roomDebug  = 
+    roomBase 
+    {
+        waters = 
+            [(x, 1) | x <- [1..6]] ++
+            [(1, 2), (3, 2), (4, 2), (6, 2),
+            (1, 4), (6, 4)]
+    }
+
 room0A :: RoomState
 room0A = 
     roomBase 
@@ -50,6 +58,7 @@ room0A =
     }
 
 
+room0B :: RoomState
 room0B = 
     roomBase
     {
@@ -67,51 +76,62 @@ room0B =
 gsBase :: GameState
 gsBase = GameState 
     {
-        userText = "Level X",
+        userText = "",
         debugText = "Debug output :",
         isCursorVisible = True,
 
+        toInit = True,
+
+        currLevelInitScreen = headItem levelsData, 
+        screenPointer = headItem levelsData,
+        titlePointer = headItem titles,
+
         elapsedFrames = 0,
-        levelIndex = 0, 
-        screenIndex = 0,
         gameOver = False,
         rooms = [],
         moveHistory = []
     }
 
 
--- HERE is where we define the actual levels using the rooms above
-levelZero :: Level
-levelZero = (
-    --starting gs of the level
-    gsBase
-    { 
-      userText = "Level 0 : Getting Started !",
-      levelIndex = 0
-    },
+-- ScreenWrap eidola
+startScreen, midScreen :: ScreenWrap 
+startScreen = ScreenWrap{
+    screen = [roomDebug],
+    isNewLevel = True
+}
 
-    --succession of "screens" == "lists of roomstates"
-    [
-        [room0B]
+midScreen = ScreenWrap {
+    screen = [roomDebug],
+    isNewLevel = False
+}
+
+-- We define the entire game as a succession of screens == room lists
+-- Every "level" consists of a set amount of screens
+level0 :: Level
+level0 = [
+    
+    startScreen {
+        screen = [room0B]
+    }
+
     ]
 
-    )
+level1 :: Level
+level1 = [
 
-levelOne :: Level
-levelOne = (
-
-    gsBase 
-    {
-        userText = "Level 1 : Binary Bifurcation Branch",
-        levelIndex = 1
+    startScreen{
+        screen = [room0B]
     },
 
-    [
-        [room0A]
+    midScreen{
+        screen = [room0A]
+    }
+
     ]
 
-    )
-
--- Combining everythings
+-- Combining everything
 levelsData:: LevelData
-levelsData = [levelZero, levelOne]
+levelsData = level0 ++ level1
+
+titles :: [Title]
+titles = ["0 : Getting Started", "1 : Binary Bifurcation Branch"]
