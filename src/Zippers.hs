@@ -21,7 +21,10 @@ instance ListItem ListZip where
   headItem xs = LP ([],head xs,tail xs)     
   value (LP (ls,x,rs)) = x                  
   
-  movL (LP (l:ls,x,rs)) = LP (ls,l,x:rs)       
+  movL orig@(LP ([], x, rs)) = orig
+  movL (LP (l:ls,x,rs)) = LP (ls,l,x:rs)  
+
+  movR orig@(LP (ls, x, [])) = orig      
   movR (LP (ls,x,r:rs)) = LP (x:ls,r,rs)      
   
   ovw y (LP (ls,x,rs)) = LP (ls,y,rs)

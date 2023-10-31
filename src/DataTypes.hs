@@ -30,8 +30,8 @@ data ScreenWrap = ScreenWrap
     screen :: Screen,
     isNewLevel :: Bool
   }
--- type Level = (GameState, [Screen])
-type LevelData = [ScreenWrap]
+type Level = [ScreenWrap]
+type LevelData = [ScreenWrap] -- multiple levels concatenated
 
 data Direction = UP | DOWN | LEFT | RIGHT deriving (Eq, Ord, Enum)
 

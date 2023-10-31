@@ -10,7 +10,7 @@ roomBase :: RoomState
 roomBase = 
     RoomState 
     {
-        character = (0, 0),
+        character = (-100, -100),
         charRot = 180,
 
         waters = [],
@@ -18,13 +18,24 @@ roomBase =
 
         isMini = False,
         isTerminal = False,
-        specialPos = (cols -1, rows - 1),
+        specialPos = (-200, -200),
         rGameOver = False
     } 
 
 -- DEFINIING ROOMS HERE
 -- ideally each room should have a name of the form
--- roomID where ID = (roomLevelNumber)([A..Z]*)
+-- room[ID] where [ID] = (roomLevelNumber)([A..Z]*)
+-- only exception is roomDebug 
+roomDebug :: RoomState
+roomDebug  = 
+    roomBase 
+    {
+        waters = 
+            [(x, 1) | x <- [1..6]] ++
+            [(1, 2), (3, 2), (4, 2), (6, 2),
+            (1, 4), (6, 4)]
+    }
+
 room0A :: RoomState
 room0A = 
     roomBase 
@@ -82,32 +93,45 @@ gsBase = GameState
     }
 
 
--- ScreenWrap eidolon
-screenEidolon :: ScreenWrap
-screenEidolon = ScreenWrap{
-    screen = [],
+-- ScreenWrap eidola
+startScreen, midScreen :: ScreenWrap 
+startScreen = ScreenWrap{
+    screen = [roomDebug],
+    isNewLevel = True
+}
+
+midScreen = ScreenWrap {
+    screen = [roomDebug],
     isNewLevel = False
 }
 
--- HERE is where we define the actual levels using the rooms above.
--- Just define a succession of screens as follows and mark each new level by a True in the wrapper
+-- We define the entire game as a succession of screens == room lists
+-- Every "level" consists of a set amount of screens
+level0 :: Level
+level0 = [
+    
+    startScreen {
+        screen = [room0B]
+    }
 
-screenZero :: ScreenWrap
-screenZero = screenEidolon{
-    screen = [room0B],
-    isNewLevel = True
-}
+    ]
 
+level1 :: Level
+level1 = [
 
-screenOne :: ScreenWrap
-screenOne = screenEidolon{
-    screen = [room0A],
-    isNewLevel = True
-}
+    startScreen{
+        screen = [room0B]
+    },
+
+    midScreen{
+        screen = [room0A]
+    }
+
+    ]
 
 -- Combining everything
 levelsData:: LevelData
-levelsData = [screenZero, screenOne]
+levelsData = level0 ++ level1
 
 titles :: [Title]
-titles = ["Level 0", "Level 1 : Binary Bifurcation Branch"]
+titles = ["0 : Getting Started", "1 : Binary Bifurcation Branch"]
