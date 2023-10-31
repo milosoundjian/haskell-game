@@ -21,6 +21,7 @@ fillCell (posX, posY) col =
     translate ((fromIntegral posX) * cellSize) ((fromIntegral posY) * cellSize) topLeftRec
 
 -- fills up the cell at input GAME coordinates with the input sprite
+-- and at the input rotation
 spriteCell :: Position -> Float -> Sprite -> Picture
 spriteCell (x, y) rotation (Sprite{picture=pic, dimensions=(w, h)}) = 
   let 

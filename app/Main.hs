@@ -20,7 +20,7 @@ import Graphics
 
 -- display the user character + the current text input
 renderRoom :: Picture -> [Sprite] -> RoomState -> Picture
-renderRoom backgroundP sprites@(squirrelS:spikeS:waterS:_) roomState = 
+renderRoom backgroundP sprites@(squirrelS:spikeS:waterS:acornS:_) roomState = 
   let 
     --display the player
     rotation = charRot roomState
@@ -36,7 +36,7 @@ renderRoom backgroundP sprites@(squirrelS:spikeS:waterS:_) roomState =
     --display the special tile
     -- TODO : replace the solid blocks with real assets
     specialDraw = if (isTerminal roomState) 
-                    then (`fillCell` rose)
+                    then (\x -> spriteCell x 0 acornS)
                     else (`fillCell` orange)
     specialP = specialDraw $ specialPos roomState
 
@@ -173,15 +173,16 @@ main = do
   squirrel <- loadBMP "assets/squirrel.bmp"
   spike <- loadBMP "assets/spike.bmp"
   water <- loadBMP "assets/water.bmp"
-
+  acorn <- loadBMP "assets/acorn.bmp"
   
   let grassS = Sprite  {picture = grass, dimensions = (32,32)} --only used rn for the background
 
   let squirrelS = Sprite  {picture = squirrel, dimensions = (32,32)}
   let spikeS = Sprite {picture = spike, dimensions = (32, 32)}
   let waterS = Sprite {picture = water, dimensions = (32, 32)}
+  let acornS = Sprite {picture = acorn, dimensions = (32, 32)}
 
-  let sprites = [squirrelS, spikeS, waterS]
+  let sprites = [squirrelS, spikeS, waterS, acornS]
                 
 
   -- generate the background once, for all future uses
