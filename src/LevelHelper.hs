@@ -56,8 +56,6 @@ movedRoomState rs  dir
       
 
 
-
-
 movedGameState :: GameState -> Direction -> GameState
 movedGameState gs dir 
   -- use short-circuiting
@@ -81,8 +79,14 @@ movedGameState gs dir
         -- just return the normally moved state 
         newGs
 
+--functions for rotating squirrels
+rotRoom :: RoomState -> Int -> RoomState
+rotRoom rs@(RoomState {charRot = cr}) rot = 
+  rs{charRot = fromIntegral $ mod (round cr + rot) 360}
 
-
+rotAllRooms :: GameState -> Int -> GameState
+rotAllRooms gs@(GameState {rooms = rs}) rot =
+    gs{ rooms = map (`rotRoom` rot) rs} 
 
 
 -- reverts to the last saved state, doesn't do anything if the history is empty

@@ -63,3 +63,6 @@ cursorFlickerDuration :: Int
 cursorFlickerDuration = 5
 cursorCharacter :: String
 cursorCharacter = "|"
+
+danceCooldown :: Int
+danceCooldown = 4

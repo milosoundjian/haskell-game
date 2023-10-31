@@ -36,10 +36,14 @@ Note: Tested with Cabal 3.10.1.0
 * Esc: Exit
 * Letters: Type into the "console" (bottom)
 
-## Console Commands
+## Console Actions
 
-* `/dance`: make the squirrel dance (spin around dance)
-* `/skin`: change the squirrel skin
-* `/kms`: kill yourself (lose the game)
-* `/win`: win the game (no satisfaction tho)
-* `/credits` opens credits
+* `add box at (x , y)` : creates a box at the given grid coordinates (sentence spacing doesn't matter)
+* `add spike at (x, y)` : same as the previous command but with a spike instead
+* `move to (x, y)` : teleports the squirrel to the given grid coordinates (only works if the specified tile is bereft of obstacles)
+* `dance` / `stop dancing`: make the squirrel dance (spin around)
+
+* `die`: kill the squirrel (game over)
+* `skin`: change the squirrel skin
+* `win`: win the game (no satisfaction tho)
+* `credits` opens credits

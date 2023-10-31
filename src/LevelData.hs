@@ -154,7 +154,9 @@ gsBase = GameState
         elapsedFrames = 0,
         gameOver = False,
         rooms = [],
-        moveHistory = []
+        moveHistory = [],
+
+        isDancing = False
     }
 
 

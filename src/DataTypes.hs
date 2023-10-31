@@ -63,8 +63,6 @@ data GameState = GameState {
 
   -- game flow related stuff
   elapsedFrames :: Int,
-  -- levelIndex :: Int,
-  -- screenIndex ::Int,
   screenPointer :: ListZip ScreenWrap,
   titlePointer :: ListZip Title,
   gameOver :: Bool,
@@ -72,7 +70,10 @@ data GameState = GameState {
 
   -- gameplay related stuff
   rooms :: Screen,
-  moveHistory :: [GameState]
+  moveHistory :: [GameState],
+
+  --misc stuff
+  isDancing :: Bool
 }
 
 

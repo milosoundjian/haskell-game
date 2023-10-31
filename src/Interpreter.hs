@@ -100,6 +100,15 @@ interpret input gs =
             [W "add", W "box", W "at", Pos newPos] ->
                     gs {rooms = map (`addWall` newPos) (rooms gs)}
 
+            [W "dance"] ->
+                    gs {isDancing = not $ isDancing gs }
+            
+            [W "stop", W "dancing"] ->
+                    gs {isDancing = False}
+
+            [W "die"] ->
+                    gs {gameOver = True}
+
             _ -> gs {debugText = "Command not recognized: " ++ (show $ mergePass. wordPass. preprocess $ input)}
 
 

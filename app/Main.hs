@@ -109,18 +109,24 @@ update :: Float -> GameState -> GameState
 update seconds gameState = 
   let 
     --increment the timer value
-    newElapsed = elapsedFrames gameState + 1
-    newVisibility = not (isCursorVisible gameState)
+    newT = elapsedFrames gameState + 1
+    oldVis = isCursorVisible gameState  
+    newVisibility = if (mod newT cursorFlickerDuration == 0) then not oldVis else oldVis 
+
 
     -- check that none of the rooms have gamed overed
     gameOverState = (gameOver gameState || any rGameOver (rooms gameState))
 
+    --create the new gamestate
+    newGs = gameState {gameOver = gameOverState, elapsedFrames = newT, isCursorVisible = newVisibility}
+
   in
     --handle all timer related utilities
-    if (mod newElapsed cursorFlickerDuration == 0) then 
-      gameState {gameOver = gameOverState, elapsedFrames = newElapsed, isCursorVisible = newVisibility}
-    else
-      gameState {gameOver = gameOverState, elapsedFrames = newElapsed}
+    if isDancing gameState && (mod newT danceCooldown == 0) then 
+      rotAllRooms newGs 90
+    else 
+      newGs
+
 
 
 
