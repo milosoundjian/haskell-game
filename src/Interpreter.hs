@@ -9,81 +9,65 @@ import LevelHelper
 
 -- This is the file that will interpret user commands
 
--- All of the constant definitions start here
-data Operation = ADD | SUB | MOVE  deriving (Show, Eq)
-data Prep = BY | AT | TO deriving (Show, Eq)
 
--- after all passes there shouldn't be any tokens of type Digit or Ch
-data Token = OP Operation | Prep Prep | Special Char | Ch Char | Digit Int | Name String | Number Int |
-             Pos Position
+-- after all passes there shouldn't be any tokens of type Digit or Special
+data Token = W String | Pos (Int, Int) | N Int | Digit Int | Special Char
                 deriving (Show, Eq) 
 
                 
 type Command = [Token]
 
-ignoredChars :: [Char]
-ignoredChars = [' ', '.', '\t',  '\r', '\n', '\v', '\f']
-
 specialChars :: [Char]
 specialChars = [',', '(', ')']
--- All of the constant definitions end here
 
  
--- helper functions for pre-processing
+-- helper functions
 rmFSpaces :: String -> String 
 rmFSpaces  = dropWhile (== ' ') 
 
 rmESpaces :: String -> String 
-rmESpaces input | (last input == ' ') = init input
+rmESpaces input | (last input == ' ') = rmESpaces (init input)
                 | otherwise = input
 
-
--- currently, just converts the input string to lowercase
-preprocess :: String -> String
-preprocess input = toLower <$> (rmFSpaces . rmESpaces $ input)
-
--- student makes WORST parser EVER, asked to LEAVE CSE301
-namePass :: String -> [Token]
-namePass input = 
-    case input of 
-        "" -> []
-
-        -- recognizing operation names ONLY if they're isolated 
-        ('a':'d':'d':rest) -> OP ADD : namePass rest
-        ('s':'u':'b':rest) -> OP SUB : namePass rest
-        ('m':'o':'v':'e':rest) -> OP MOVE : namePass rest
-
-        -- recognizing preposition names
-        ('a':'t':rest) -> Prep AT : namePass rest
-        ('b':'y':rest) -> Prep BY : namePass rest
-        ('t':'o':rest) -> Prep TO : namePass rest
-
-        -- skipping empty characters for anything else
-        (c:rest) | elem c ignoredChars -> namePass rest
-
-
-        --sorting anything else into chars and digits
-        (d:rest) | isDigit d -> Digit (digitToInt d) : namePass rest
-        (c:rest) -> if (elem c specialChars) then 
-                        (Special c : namePass rest) 
-                    else 
-                        (Ch c: namePass rest)
+rmDSpaces :: String -> String
+rmDSpaces [] = []
+rmDSpaces [x] = [x]
+rmDSpaces (x1:x2:xs) 
+    | x1 == ' ' && x2 == ' ' = rmDSpaces (x2:xs)
+    | otherwise =  x1 : rmDSpaces (x2:xs) 
 
 
 
--- This pass merges all of the lonely chars and lonely digits together 
+-- makes input into standardized format 
+preprocess :: String -> [String]
+preprocess input = words $ toLower <$> (rmFSpaces . rmESpaces . rmDSpaces $ input)
+
+
+-- This pass makes strings into word tokens, but leaves the other characters alone
+wordPass :: [String] -> [Token]
+wordPass [] = []
+wordPass ("" :ws) = wordPass ws
+wordPass (word@(prefix:rest) : ws) 
+
+    | isLetter prefix = W word : (wordPass ws)
+    | isDigit prefix = Digit (digitToInt prefix) : wordPass ( rest:ws )
+    | prefix `elem `specialChars = Special prefix : wordPass (rest:ws)
+    
+    -- ignore anything else
+    | otherwise = wordPass ws
+
+
+
+-- This pass merges all digits into numbers 
 mergePass :: [Token] -> [Token]
 mergePass [] = []
+mergePass tokens = 
+    case tokens of 
+        (Digit a : Digit b : rest) -> mergePass (N (a * 10 + b):rest) 
+        (N aa : Digit b : rest) -> mergePass (N (aa * 10 + b ):rest)
+        (Digit a : rest) -> N a : (mergePass rest)
 
-mergePass (Ch a:Ch b:rest) = mergePass $ Name [a,b]: rest
-mergePass (Name a:Ch b:rest) = mergePass $ Name (a ++ [b]) : rest
-
-mergePass (Digit a:Digit b:rest) = mergePass $ Number (a*10 + b) : rest
-mergePass (Number a:Digit b:rest) = mergePass $ Number (a * 10 + b) : rest
-
-mergePass (Ch a :rest) = Name [a] :mergePass rest
-mergePass (Digit a : rest) = Number a : mergePass rest
-mergePass (other : rest) = other:mergePass rest
+        (x:rest) -> x:(mergePass rest)
 
 
 
@@ -91,29 +75,31 @@ mergePass (other : rest) = other:mergePass rest
 -- Also eliminate any special characters that don't fit into anything
 posPass :: [Token] -> Command 
 posPass [] = []
+posPass tokens = 
+    case tokens of 
+        (Special '(':N x:Special ',':N y: Special ')':rest) -> Pos (x,y):posPass rest
+        (Special c:rest) -> posPass rest
 
-posPass (Special '(':Number x:Special ',':Number y: Special ')':rest) = Pos (x,y):posPass rest
-posPass (Special c : rest) = posPass rest
-posPass (x:rest) = x:posPass rest
+        (x:rest) -> x:(posPass rest)
 
 
+-- student makes WORST lexer EVER, asked to LEAVE CSE301
 interpret :: String -> GameState -> GameState
 interpret "" gs = gs
 interpret input gs =
     let
-        command = posPass . mergePass. namePass. preprocess $ input
-
+        command = posPass . mergePass. wordPass. preprocess $ input
     in
         case command of
-            [OP MOVE, Prep TO, Pos newPos] -> 
+            [W "move", W "to", Pos newPos] -> 
                     gs {rooms = map (`movedToRoomState` newPos) (rooms gs)  }   
 
-            [OP ADD, Name "spike", Prep AT, Pos newPos] ->
+            [W "add", W "spike", W "at", Pos newPos] ->
                     gs {rooms = map (`addSpike` newPos) (rooms gs)}
             
-            [OP ADD, Name "box", Prep AT, Pos newPos] ->
+            [W "add", W "box", W "at", Pos newPos] ->
                     gs {rooms = map (`addWall` newPos) (rooms gs)}
 
-            _ -> gs {debugText = "Command not recognized: " ++ (show command)}
+            _ -> gs {debugText = "Command not recognized: " ++ (show $ mergePass. wordPass. preprocess $ input)}
 
 
