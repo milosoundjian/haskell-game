@@ -95,6 +95,7 @@ undoLastMove gs
 initRooms :: GameState -> GameState
 initRooms gs@(GameState{titlePointer = tp, screenPointer = sp}) = gs{userText = value tp, rooms = screen $ value sp}
 
+
 -- reloads the level at the current level id 
 restartLevel :: GameState -> GameState
 restartLevel curGs@(GameState{currLevelInitScreen = scr}) = initRooms curGs{
