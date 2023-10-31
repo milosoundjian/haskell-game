@@ -36,7 +36,7 @@ movedToRoomState rs (x,y)
     newPos = (legalX, legalY)
   in
     -- only allow purely legal moves (no spike losses either)
-    if not (newPos `elem` spikes rs || newPos `elem` waters rs || newPos == specialPos rs ) then
+    if not (newPos `elem` spikes rs || newPos `elem` walls rs || newPos == specialPos rs ) then
       rs {character = (legalX, legalY)}
     else 
       rs
@@ -48,8 +48,8 @@ movedRoomState rs  dir
   let
     newPos = move (character rs) dir 
   in
-    -- kill player if go into spikes, prevent them from moving if go into water
-    case (newPos `elem` waters rs, newPos `elem` spikes rs) of 
+    -- kill player if go into spikes, prevent them from moving if go into wall
+    case (newPos `elem` walls rs, newPos `elem` spikes rs) of 
       (True, _) -> rs {charRot = directionAngleMap dir}
       (False, True) ->  rs {character = (-100, -100), charRot = directionAngleMap dir, rGameOver = True} 
       (False, False) ->  rs {character = newPos, charRot = directionAngleMap dir}
@@ -142,10 +142,10 @@ addSpike rs addPos =
   else 
     rs {spikes = addPos:(spikes rs) } 
 
-addWater :: RoomState -> Position -> RoomState
-addWater rs addPos =
-  if (elem addPos (waters rs)) then 
+addWall :: RoomState -> Position -> RoomState
+addWall rs addPos =
+  if (elem addPos (walls rs)) then 
     rs
   else 
-    rs {waters = addPos:(waters rs) } 
+    rs {walls = addPos:(walls rs) } 
 

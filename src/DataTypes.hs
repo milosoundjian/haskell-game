@@ -41,7 +41,7 @@ data RoomState = RoomState
       character :: Character,
       charRot :: Float, -- character rotation
 
-      waters :: [Position],
+      walls :: [Position],
       spikes :: [Position],
 
       isMini :: Bool, -- mini rooms have their tile size halved

@@ -111,8 +111,8 @@ interpret input gs =
             [OP ADD, Name "spike", Prep AT, Pos newPos] ->
                     gs {rooms = map (`addSpike` newPos) (rooms gs)}
             
-            [OP ADD, Name "water", Prep AT, Pos newPos] ->
-                    gs {rooms = map (`addWater` newPos) (rooms gs)}
+            [OP ADD, Name "box", Prep AT, Pos newPos] ->
+                    gs {rooms = map (`addWall` newPos) (rooms gs)}
 
             _ -> gs {debugText = "Command not recognized: " ++ (show command)}
 

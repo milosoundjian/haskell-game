@@ -20,17 +20,17 @@ import Graphics
 
 -- display the user character + the current text input
 renderRoom :: Picture -> [Sprite] -> RoomState -> Picture
-renderRoom backgroundP sprites@(squirrelS:spikeS:waterS:acornS:_) roomState = 
+renderRoom backgroundP sprites@(squirrelS:spikeS:boxS:acornS:_) roomState = 
   let 
     --display the player
     rotation = charRot roomState
     player = spriteCell (character roomState) rotation (squirrelS)
 
     -- display the grid entities
-    renderWaters pos = spriteCell pos 0 waterS
+    renderBoxes pos = spriteCell pos 0 boxS
     renderSpikes pos = spriteCell pos 0 spikeS
 
-    watersP = map renderWaters (waters roomState)  
+    boxesP = map renderBoxes (walls roomState)  
     spikesP = map renderSpikes (spikes roomState)
 
     --display the special tile
@@ -42,7 +42,7 @@ renderRoom backgroundP sprites@(squirrelS:spikeS:waterS:acornS:_) roomState =
 
   in
     -- combine everything
-    pictures ([backgroundP, grid, player, specialP] ++ watersP ++ spikesP)
+    pictures ([backgroundP, grid, player, specialP] ++ boxesP ++ spikesP)
 
 -- fallback in case one of the sprites arguments wasn't passed in 
 renderRoom _ _ _ = displayErrorScreen 
@@ -50,7 +50,7 @@ renderRoom _ _ _ = displayErrorScreen
 
 -- display each game room at the proper position
 render :: Picture -> [Sprite] -> GameState  -> Picture
-render backgroundP sprites@(squirrelS:spikeS:waterS:_) gameState =
+render backgroundP sprites@(squirrelS:spikeS:boxS:_) gameState =
   let 
     -- rendering all of the UI elements 
     cursorSuffix = if (isCursorVisible gameState) 
@@ -172,17 +172,17 @@ main = do
   grass <- loadBMP "assets/grass.bmp"
   squirrel <- loadBMP "assets/squirrel.bmp"
   spike <- loadBMP "assets/spike.bmp"
-  water <- loadBMP "assets/water.bmp"
+  box <- loadBMP "assets/box.bmp"
   acorn <- loadBMP "assets/acorn.bmp"
   
   let grassS = Sprite  {picture = grass, dimensions = (32,32)} --only used rn for the background
 
   let squirrelS = Sprite  {picture = squirrel, dimensions = (32,32)}
   let spikeS = Sprite {picture = spike, dimensions = (32, 32)}
-  let waterS = Sprite {picture = water, dimensions = (32, 32)}
+  let boxS = Sprite {picture = box, dimensions = (32, 32)}
   let acornS = Sprite {picture = acorn, dimensions = (32, 32)}
 
-  let sprites = [squirrelS, spikeS, waterS, acornS]
+  let sprites = [squirrelS, spikeS, boxS, acornS]
                 
 
   -- generate the background once, for all future uses
