@@ -37,10 +37,10 @@ clearTextInput = KeyDelete
 -- Rows and Columns MUST BE divisible by 2 
 -- or the program isn't guaranteed to work
 rows :: Int
-rows = 6
+rows = 8
 
 cols :: Int
-cols = 8
+cols = 10
 
 cellSize :: Float
 cellSize = 100

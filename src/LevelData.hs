@@ -31,46 +31,46 @@ roomDebug  =
     roomBase 
     {
         waters = 
-            [(x, 1) | x <- [1..6]] ++
-            [(1, 2), (3, 2), (4, 2), (6, 2),
-            (1, 4), (6, 4)]
+            [(x, 1) | x <- [1..8]] ++
+            [(x, 2) | x <- [1..8]] ++
+            [(1, 3), (2, 3), --(4, 3), (5, 3),
+            (7, 3), (8, 3),
+
+            (1, 6), (2, 6), (1, 5), (2, 5),
+            (7, 6), (8, 6), (7, 5), (8, 5)
+            ]
+
     }
 
 room0A :: RoomState
 room0A = 
     roomBase 
     {
-        character = (0, 5),
-        charRot = 0,
+        character = (9, 1),
+        charRot = 180,
 
-        waters = [
-            (0, 1), (0, 2), (1, 1), (1, 0), 
-            (2, 0), (3, 0), (4, 0), (5, 0),
-            (5, 1), (6, 1), (6, 2), (7, 3), 
-            (6, 4), (5, 4), (4, 4), (4, 3), 
-            (2, 4), (2, 5), (1, 5), (3, 3),
-            (2, 3)
-            ],
-        spikes = [],
+        waters = 
+             [(0, 7), (0, 6), (0, 5), (2, 7), (2, 6), (2, 5), (2, 4),
+                    (2, 3), (2, 2), (3, 2), (3, 1), (4, 4), (4, 1), (5, 5),
+                    (5, 3), (6, 4), (6, 3), (6, 2), (6, 1), (6, 0), (7, 7),
+                    (7, 3), (7, 2), (7, 1), (7, 0), (8, 7), (8, 6), (8, 0),
+                    (9, 6), (9, 5), (9, 0)],
+            
+        spikes = [(0, 0), (1, 7), (3, 7), (3, 6), (4, 7), (5, 4), (9, 7)],
 
-        isTerminal = False,
-        specialPos = (6, 3)
-    }
-
-
-room0B :: RoomState
-room0B = 
-    roomBase
-    {
-        character = (0, 1),
-        charRot = -90,
-
-        spikes = [(1, 0), (2, 0), (3, 0), (1, 2), (2, 2), (3, 2)],
-
-        isMini = True,
         isTerminal = True,
-        specialPos = (3, 1) 
+        specialPos = (1, 6)
     }
+
+
+
+
+-- room1A :: RoomState 
+-- room1A = 
+--     roomBase 
+--     {
+
+--     }
 
 --eidolon game state 
 gsBase :: GameState
@@ -111,7 +111,7 @@ level0 :: Level
 level0 = [
     
     startScreen {
-        screen = [room0B]
+        screen = [room0A]
     }
 
     ]
@@ -120,7 +120,7 @@ level1 :: Level
 level1 = [
 
     startScreen{
-        screen = [room0B]
+        screen = [room0A]
     },
 
     midScreen{

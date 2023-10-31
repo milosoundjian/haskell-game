@@ -193,9 +193,9 @@ main = do
   screenSize <- getScreenSize 
 
   let xCentered = (fromIntegral (fst screenSize) - gameWidth) / 2.0
-  let yCentered = (fromIntegral (snd screenSize) - gameHeight) / 2.0 
+  --let yCentered = (fromIntegral (snd screenSize) - gameHeight) / 2.0 
   let window = InWindow "Haskell Puzzle Game" (round gameWidth, round gameHeight) 
-               (round xCentered, round yCentered)
+               (round xCentered, 0)
 
   -- load the first level in list 
   -- let firstLevel = (fst $ head levelsData) {rooms = head $ snd $ head levelsData} 
