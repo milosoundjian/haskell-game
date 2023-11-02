@@ -4,6 +4,7 @@ module Zippers where
 class ListItem lp where
   headItem :: [a] -> lp a       -- create a pointer to the head of a (non-empty) list
   value :: lp a -> a            -- return the value stored at the pointer
+  list :: lp a -> [a]           -- return the underlying list
   movL :: lp a -> lp a          -- move the pointer to the left
   movR :: lp a -> lp a          -- move the pointer to the right
   ovw :: a -> lp a -> lp a      -- overwrite item with new value
@@ -24,8 +25,10 @@ instance ListItem ListZip where
   movL orig@(LP ([], x, rs)) = orig
   movL (LP (l:ls,x,rs)) = LP (ls,l,x:rs)  
 
-  movR orig@(LP (ls, x, [])) = orig      
-  movR (LP (ls,x,r:rs)) = LP (x:ls,r,rs)      
+  -- movR orig@(LP (ls, x, [])) = orig
+  movR orig@(LP (ls, x, [])) = headItem $ list orig    -- Loop back
+  movR (LP (ls,x,r:rs)) = LP (x:ls,r,rs)   
+  list (LP (ls,x,rs)) = reverse ls ++ [x] ++ rs   
   
   ovw y (LP (ls,x,rs)) = LP (ls,y,rs)
 
@@ -41,14 +44,17 @@ data BinCxt a = Hole | B0 a (BinCxt a) (BinTree a) | B1 a (BinTree a) (BinCxt a)
 
 type BinZip a = (BinCxt a, BinTree a)
 
--- Leaf and Hole cases left unimplemented because ideally they won't be encountered
-go_left :: BinZip a -> BinZip a
-go_left (c,B a t1 t2) = (B0 a c t2,t1)  -- focus on the left child
+-- Leaf cases left unimplemented because ideally, they won't be encountered
 
-go_right :: BinZip a -> BinZip a
-go_right (c,B a t1 t2) = (B1 a t1 c,t2) -- focus on the right child
+goLeft :: BinZip a -> BinZip a
+goLeft (c,B a t1 t2) = (B0 a c t2,t1)  -- focus on the left child
+
+goRight :: BinZip a -> BinZip a
+goRight (c,B a t1 t2) = (B1 a t1 c,t2) -- focus on the right child
 
 
-go_down :: BinZip a -> BinZip a
-go_down (B0 a c t2,t) = (c,B a t t2)    -- focus on parent *from* left child
-go_down (B1 a t1 c,t) = (c,B a t1 t)    -- focus on parent *from* right child
+goDown :: BinZip a -> BinZip a
+goDown (B0 a c t2,t) = (c,B a t t2)    -- focus on parent *from* left child
+goDown (B1 a t1 c,t) = (c,B a t1 t)    -- focus on parent *from* right child
+goDown (Hole, t) = (Hole, t)        
+

@@ -28,10 +28,17 @@ type Title = String
 data ScreenWrap = ScreenWrap
   {
     screen :: Screen,
-    isNewLevel :: Bool
+    isNewLevel :: Bool,
+    solved :: Bool, 
+    leftSolved :: Bool,
+    rightSolved :: Bool
   }
 type Level = [ScreenWrap]
 type LevelData = [ScreenWrap] -- multiple levels concatenated
+
+type ScreenTree = BinTree ScreenWrap
+
+
 
 data Direction = UP | DOWN | LEFT | RIGHT deriving (Eq, Ord, Enum)
 
@@ -63,10 +70,10 @@ data GameState = GameState {
 
   -- game flow related stuff
   elapsedFrames :: Int,
-  screenPointer :: ListZip ScreenWrap,
+  screenPointer :: BinZip ScreenWrap,
   titlePointer :: ListZip Title,
   gameOver :: Bool,
-  currLevelInitScreen :: ListZip ScreenWrap,  -- pointer to screen at the start of current Level
+  currLevelInitScreen :: BinZip ScreenWrap,  -- pointer to screen at the start of current Level
 
   -- gameplay related stuff
   rooms :: Screen,

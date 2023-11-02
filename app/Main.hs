@@ -16,7 +16,7 @@ import Interpreter
 import Graphics
 
 
-
+  
 
 -- display the user character + the current text input
 renderRoom :: Picture -> [Sprite] -> RoomState -> Picture
@@ -143,6 +143,7 @@ handleKeys (EventKey (SpecialKey key) Down _ _) gameState
   | key == downInput = movedGameState gameState DOWN
 
   | key == undoInput = undoLastMove gameState
+
   | key == resetInput = restartLevel gameState
 
   | key == clearTextInput = gameState {userText = ""}

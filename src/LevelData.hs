@@ -147,8 +147,8 @@ gsBase = GameState
 
         toInit = True,
 
-        currLevelInitScreen = headItem levelsData, 
-        screenPointer = headItem levelsData,
+        currLevelInitScreen = (Hole, gameScreenTree), 
+        screenPointer = (Hole, gameScreenTree),
         titlePointer = headItem titles,
 
         elapsedFrames = 0,
@@ -164,12 +164,18 @@ gsBase = GameState
 startScreen, midScreen :: ScreenWrap 
 startScreen = ScreenWrap{
     screen = [roomDebug],
-    isNewLevel = True
+    isNewLevel = True,
+    solved = False,
+    leftSolved = False, 
+    rightSolved = False
 }
 
 midScreen = ScreenWrap {
     screen = [roomDebug],
-    isNewLevel = False
+    isNewLevel = False,
+    solved = False,
+    leftSolved = False, 
+    rightSolved = False
 }
 
 -- We define the entire game as a succession of screens == room lists
@@ -209,3 +215,22 @@ levelsData = level0 ++ level1 ++ level2
 
 titles :: [Title]
 titles = ["0 : Initiation", "1 : The Pursuit of Happiness", "2 : Roundabout"]
+
+bisect :: [a] -> ([a], [a])
+bisect lst =
+    let
+        x = (length lst) `div` 2
+    in
+        splitAt x lst
+
+
+treeify :: LevelData -> ScreenTree
+treeify [] = Leaf
+treeify (sw : sws) =
+    let
+        (l, r) = bisect sws
+    in
+        B sw (treeify l) (treeify r)
+
+gameScreenTree :: ScreenTree    -- The final tree to be traversed in the game 
+gameScreenTree = treeify levelsData

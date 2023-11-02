@@ -96,8 +96,12 @@ undoLastMove gs
   | otherwise = head $ moveHistory gs
 
 -- Initializes rooms and title from the screen pointer in the GameState provided
+-- initRooms :: GameState -> GameState
+-- initRooms gs@(GameState{titlePointer = tp, screenPointer = sp}) = gs{userText = value tp, rooms = screen $ value sp}
+
 initRooms :: GameState -> GameState
-initRooms gs@(GameState{titlePointer = tp, screenPointer = sp}) = gs{userText = value tp, rooms = screen $ value sp}
+initRooms gs@(GameState{screenPointer = (c, Leaf)}) = gs{userText = "EMPTY GAME TREE", rooms = [roomDebug]}
+initRooms gs@(GameState{titlePointer = tp, screenPointer = (c, B sw _ _)}) = gs{userText = value tp, rooms = screen sw}
 
 
 -- reloads the level at the current level id 
@@ -108,18 +112,24 @@ restartLevel curGs@(GameState{currLevelInitScreen = scr}) = initRooms curGs{
   moveHistory = []        -- moveHistory will be emptied out
 }
 
+-- finds next unsolved screen in the pre order traversal of the tree
+findNextScreen :: BinZip ScreenWrap -> BinZip ScreenWrap
+findNextScreen sp@(_, Leaf) = findNextScreen $ goDown sp  -- reached leaf go back 
+findNextScreen sp@(cxt, B sw l r)
+  | not $ solved sw = sp      -- found unsolved screen
+  | not $ leftSolved sw = findNextScreen $ goLeft (cxt, B sw{leftSolved = True} l r)  -- look in the left and mark left solved
+  | not $ rightSolved sw = findNextScreen $ goRight (cxt, B sw{rightSolved = True} l r)  -- look in the right and mark right solved
+  | otherwise = findNextScreen $ goDown (cxt, B sw{solved = False, leftSolved = False, rightSolved = False} l r)
+  -- subtree is solved entirely. Mark everything unsolved to allow the game to just loop through levels again. This also
+  -- avoids infinite looping in case cxt is Hole
 
 -- moves player to the next screen of current level
 -- currently doesn't implement level transition
 
 nextGameState :: GameState -> GameState
-nextGameState curGs@(GameState {currLevelInitScreen = clis, screenPointer = sp, titlePointer = tp})
-  | isLast sp = curGs   -- no more to load
-  | otherwise = 
+nextGameState curGs@(GameState {currLevelInitScreen = clis, screenPointer = (c, B sw l r), titlePointer = tp}) =
     let 
-      newSp = movR sp   -- increment pointer
-      screenInfo = value newSp
-      
+      newSp@(_, B screenInfo _ _) = findNextScreen (c, B sw{solved = True} l r)   
       isNewLvl = isNewLevel screenInfo    
       newTp = if isNewLvl then movR tp else tp    -- change title if new level
     
@@ -131,7 +141,6 @@ nextGameState curGs@(GameState {currLevelInitScreen = clis, screenPointer = sp, 
         titlePointer = newTp, 
         moveHistory = []
       }
-       
       
 
 --check whether a room has a squirrel-special object collision
