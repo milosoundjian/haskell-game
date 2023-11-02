@@ -1,10 +1,13 @@
 # haskell-game
 
-Enjoy the trials and tribulations of life as a squirrel in Haskell
+Enjoy the trials and tribulations of life as a squirrel in Haskell.
 
-An game written in Haskell using the [Gloss](https://hackage.haskell.org/package/gloss) library.
+A game written in Haskell using the [Gloss](https://hackage.haskell.org/package/gloss) library.
 
 ## Installation
+
+Either stack or cabal is required to turn the project into an executable format.
+Compilation has been tested on Windows 10 as well as a select few lab machines.  
 
 ### Stack
 
@@ -31,10 +34,10 @@ Note: Tested with Cabal 3.10.1.0
 ## Controls
 
 * Arrow Keys: Move
-* Shift: Undo
-* Ctrl: Restart level
-* Esc: Exit
-* Letters: Type into the "console" (bottom)
+* Left Shift: Undo
+* Left Ctrl: Restart level
+* Esc: Close the game
+* Every other letter: Type into the game "console" (bottom)
 
 ## Console Actions
 
@@ -42,8 +45,4 @@ Note: Tested with Cabal 3.10.1.0
 * `add spike at (x, y)` : same as the previous command but with a spike instead
 * `move to (x, y)` : teleports the squirrel to the given grid coordinates (only works if the specified tile is bereft of obstacles)
 * `dance` / `stop dancing`: make the squirrel dance (spin around)
-
 * `die`: kill the squirrel (game over)
-* `skin`: change the squirrel skin
-* `win`: win the game (no satisfaction tho)
-* `credits` opens credits
