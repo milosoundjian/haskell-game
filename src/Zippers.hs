@@ -33,5 +33,22 @@ instance ListItem ListZip where
   isLast (LP (ls, x, rs)) = null rs
 
 
+-- Zipper definition for binary trees from the project description (slightly adapted to work with labelled binary trees)
+
+data BinTree a = Leaf | B a (BinTree a) (BinTree a)
+
+data BinCxt a = Hole | B0 a (BinCxt a) (BinTree a) | B1 a (BinTree a) (BinCxt a)
+
+type BinZip a = (BinCxt a, BinTree a)
+
+-- Leaf and Hole cases left unimplemented because ideally they won't be encountered
+go_left :: BinZip a -> BinZip a
+go_left (c,B a t1 t2) = (B0 a c t2,t1)  -- focus on the left child
+
+go_right :: BinZip a -> BinZip a
+go_right (c,B a t1 t2) = (B1 a t1 c,t2) -- focus on the right child
 
 
+go_down :: BinZip a -> BinZip a
+go_down (B0 a c t2,t) = (c,B a t t2)    -- focus on parent *from* left child
+go_down (B1 a t1 c,t) = (c,B a t1 t)    -- focus on parent *from* right child
