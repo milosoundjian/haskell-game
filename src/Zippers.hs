@@ -59,9 +59,11 @@ toTree (cxt, t) = plug cxt t
 -- Leaf cases left unimplemented because ideally, they won't be encountered
 
 goLeft :: BinZip a -> BinZip a
+goLeft (c, B a Leaf r) = (c, B a Leaf r)    -- don't want to point to leaves
 goLeft (c,B a t1 t2) = (B0 a c t2,t1)  -- focus on the left child
 
 goRight :: BinZip a -> BinZip a
+goRight (c, B a l Leaf) = (c, B a l Leaf)   -- don't want to point to leaves
 goRight (c,B a t1 t2) = (B1 a t1 c,t2) -- focus on the right child
 
 

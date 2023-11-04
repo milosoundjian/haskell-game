@@ -33,7 +33,8 @@ data ScreenWrap = ScreenWrap
     active :: Bool, 
     solved :: Bool, 
     leftSolved :: Bool,
-    rightSolved :: Bool
+    rightSolved :: Bool,
+    title :: String
   }
 type Level = [ScreenWrap]
 type LevelData = [ScreenWrap] -- multiple levels concatenated
@@ -72,7 +73,6 @@ data GameState = GameState {
   -- game flow related stuff
   elapsedFrames :: Int,
   screenPointer :: BinZip ScreenWrap,
-  titlePointer :: ListZip Title,
   gameOver :: Bool,
   currLevelInitScreen :: BinZip ScreenWrap,  -- pointer to screen at the start of current Level
   paused :: Bool,

@@ -14,7 +14,7 @@ import LevelHelper
 import LevelData
 import Interpreter
 import Graphics
-import Zippers
+import PauseScreen
 
 
   
@@ -47,30 +47,6 @@ renderRoom backgroundP sprites@(squirrelS:spikeS:boxS:acornS:_) roomState =
 
 -- fallback in case one of the sprites arguments wasn't passed in 
 renderRoom _ _ _ = displayErrorScreen 
-
-getTreePic :: Sprite -> Sprite -> Sprite -> BinZip ScreenWrap -> Picture
-getTreePic activePic visitedPic toVisitPic sp =
-  let 
-    spriteTree = getScreenSprite activePic visitedPic toVisitPic <$> toTree sp
-  in
-    fromSpriteTree (0, gameHeight / 2 - 40, gameWidth / 4, 50) spriteTree
-
-fromSpriteTree :: (Float, Float, Float, Float) -> BinTree Sprite -> Picture
-fromSpriteTree _ Leaf = pictures []
-fromSpriteTree (x, y, dx, dy) (B s@(Sprite{dimensions = (w, h), picture = pic}) lsub rsub) =
-  let 
-    lpic = fromSpriteTree (x - dx, y - dy, dx / 2, dy) lsub
-    rpic = fromSpriteTree (x + dx, y - dy, dx / 2, dy) rsub
-  in
-    pictures [translate x y pic, lpic, rpic]
-
-
-
-getScreenSprite :: Sprite -> Sprite -> Sprite -> ScreenWrap -> Sprite
-getScreenSprite activePic visitedPic toVisitPic sw@(ScreenWrap{active = act, visited = vis})
-  | act = activePic
-  | vis = visitedPic
-  | otherwise = toVisitPic
 
 
 
@@ -160,7 +136,11 @@ update seconds gameState =
 handleKeys :: Event -> GameState -> GameState
 
 handleKeys (EventKey (SpecialKey key) Down _ _) gameState@(GameState{paused = True})
+  -- allow user to navigate previously visited rooms from the pause screen
   | key == togglePause = gameState{paused = False}
+  | key == upInput = switchRooms gameState UP
+  | key == leftInput = switchRooms gameState LEFT
+  | key == rightInput = switchRooms gameState RIGHT 
 
 -- HANDLE all special characters in one BIG boolean guard
 handleKeys (EventKey (SpecialKey key) Down _ _) gameState

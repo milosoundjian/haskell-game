@@ -149,7 +149,6 @@ gsBase = GameState
 
         currLevelInitScreen = (Hole, gameScreenTree), 
         screenPointer = (Hole, gameScreenTree),
-        titlePointer = headItem titles,
 
         elapsedFrames = 0,
         gameOver = False,
@@ -169,7 +168,8 @@ startScreen = ScreenWrap{
     leftSolved = False, 
     rightSolved = False,
     visited = False,
-    active = False
+    active = False,
+    title = ""
 }
 
 midScreen = ScreenWrap {
@@ -179,7 +179,8 @@ midScreen = ScreenWrap {
     leftSolved = False, 
     rightSolved = False,
     active = False,
-    visited = False
+    visited = False,
+    title = ""
 }
 
 -- We define the entire game as a succession of screens == room lists
@@ -220,6 +221,17 @@ levelsData = level0 ++ level1 ++ level2
 titles :: [Title]
 titles = ["0 : Initiation", "1 : The Pursuit of Happiness", "2 : Roundabout"]
 
+addTitlesTL :: [Title] -> [ScreenWrap] -> [ScreenWrap]
+addTitlesTL ts = addTitles (headItem ("dummy" : ts))
+
+addTitles :: ListZip Title -> [ScreenWrap] -> [ScreenWrap]
+addTitles _ [] = []
+addTitles tp (sw:sws) = sw' : addTitles tp' sws where
+    tp' = if isNewLevel sw then movR tp else tp
+    sw' = sw{title = value tp'}
+
+
+
 bisect :: [a] -> ([a], [a])
 bisect lst =
     let
@@ -237,4 +249,4 @@ treeify (sw : sws) =
         B sw (treeify l) (treeify r)
 
 gameScreenTree :: ScreenTree    -- The final tree to be traversed in the game 
-gameScreenTree = treeify levelsData
+gameScreenTree = treeify $ addTitlesTL (titles ++ titles ++ titles) (levelsData ++ levelsData ++ levelsData)
