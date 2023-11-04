@@ -24,7 +24,7 @@ togglePause :: SpecialKey
 -- etc... all of them must be special key constructors
 
 upInput = KeyUp
-downInput = KeyShiftR
+downInput = KeyDown
 rightInput = KeyRight
 leftInput = KeyLeft
 

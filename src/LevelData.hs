@@ -249,4 +249,4 @@ treeify (sw : sws) =
         B sw (treeify l) (treeify r)
 
 gameScreenTree :: ScreenTree    -- The final tree to be traversed in the game 
-gameScreenTree = treeify $ addTitlesTL (titles ++ titles ++ titles) (levelsData ++ levelsData ++ levelsData)
+gameScreenTree = treeify $ addTitlesTL (titles ++ titles ++ titles) (levelsData ++ levelsData ++ levelsData) -- reuse levels for testing
