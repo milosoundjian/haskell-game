@@ -40,9 +40,21 @@ instance ListItem ListZip where
 
 data BinTree a = Leaf | B a (BinTree a) (BinTree a)
 
+instance Functor BinTree where
+  fmap _ Leaf = Leaf
+  fmap f (B a lsub rsub) = B (f a) (fmap f lsub) (fmap f rsub)
+
 data BinCxt a = Hole | B0 a (BinCxt a) (BinTree a) | B1 a (BinTree a) (BinCxt a)
 
 type BinZip a = (BinCxt a, BinTree a)
+
+plug :: BinCxt a -> BinTree a -> BinTree a
+plug Hole      t = t
+plug (B0 a c t2) t = plug c (B a t t2)
+plug (B1 a t1 c) t = plug c (B a t1 t)
+
+toTree :: BinZip a -> BinTree a
+toTree (cxt, t) = plug cxt t
 
 -- Leaf cases left unimplemented because ideally, they won't be encountered
 

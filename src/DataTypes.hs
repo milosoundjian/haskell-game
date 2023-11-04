@@ -29,6 +29,8 @@ data ScreenWrap = ScreenWrap
   {
     screen :: Screen,
     isNewLevel :: Bool,
+    visited :: Bool,
+    active :: Bool, 
     solved :: Bool, 
     leftSolved :: Bool,
     rightSolved :: Bool
@@ -66,7 +68,6 @@ data GameState = GameState {
   debugText :: String,
   isCursorVisible :: Bool,
 
-  toInit :: Bool,   -- Need to initialize the rooms (from the screen pointed to by screenPointer) or not
 
   -- game flow related stuff
   elapsedFrames :: Int,
@@ -74,6 +75,7 @@ data GameState = GameState {
   titlePointer :: ListZip Title,
   gameOver :: Bool,
   currLevelInitScreen :: BinZip ScreenWrap,  -- pointer to screen at the start of current Level
+  paused :: Bool,
 
   -- gameplay related stuff
   rooms :: Screen,

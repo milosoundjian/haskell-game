@@ -17,6 +17,10 @@ downInput :: SpecialKey
 rightInput :: SpecialKey 
 leftInput :: SpecialKey 
 undoInput :: SpecialKey
+resetInput :: SpecialKey
+submitTextInput :: SpecialKey
+clearTextInput :: SpecialKey
+togglePause :: SpecialKey
 -- etc... all of them must be special key constructors
 
 upInput = KeyUp
@@ -29,6 +33,7 @@ resetInput = KeyCtrlL
 
 submitTextInput = KeyEnter
 clearTextInput = KeyDelete
+togglePause = KeyAltL
 
 
 

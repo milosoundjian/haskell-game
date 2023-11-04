@@ -145,7 +145,7 @@ gsBase = GameState
         debugText = "Debug output :",
         isCursorVisible = True,
 
-        toInit = True,
+        paused = False, 
 
         currLevelInitScreen = (Hole, gameScreenTree), 
         screenPointer = (Hole, gameScreenTree),
@@ -167,7 +167,9 @@ startScreen = ScreenWrap{
     isNewLevel = True,
     solved = False,
     leftSolved = False, 
-    rightSolved = False
+    rightSolved = False,
+    visited = False,
+    active = False
 }
 
 midScreen = ScreenWrap {
@@ -175,7 +177,9 @@ midScreen = ScreenWrap {
     isNewLevel = False,
     solved = False,
     leftSolved = False, 
-    rightSolved = False
+    rightSolved = False,
+    active = False,
+    visited = False
 }
 
 -- We define the entire game as a succession of screens == room lists

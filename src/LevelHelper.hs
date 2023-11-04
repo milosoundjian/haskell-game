@@ -101,7 +101,7 @@ undoLastMove gs
 
 initRooms :: GameState -> GameState
 initRooms gs@(GameState{screenPointer = (c, Leaf)}) = gs{userText = "EMPTY GAME TREE", rooms = [roomDebug]}
-initRooms gs@(GameState{titlePointer = tp, screenPointer = (c, B sw _ _)}) = gs{userText = value tp, rooms = screen sw}
+initRooms gs@(GameState{titlePointer = tp, screenPointer = (c, B sw l r)}) = gs{userText = value tp, rooms = screen sw, screenPointer = (c, B sw{active = True} l r)}
 
 
 -- reloads the level at the current level id 
@@ -115,8 +115,8 @@ restartLevel curGs@(GameState{currLevelInitScreen = scr}) = initRooms curGs{
 -- finds next unsolved screen in the pre order traversal of the tree
 findNextScreen :: BinZip ScreenWrap -> BinZip ScreenWrap
 findNextScreen sp@(_, Leaf) = findNextScreen $ goDown sp  -- reached leaf go back 
-findNextScreen sp@(cxt, B sw l r)
-  | not $ solved sw = sp      -- found unsolved screen
+findNextScreen (cxt, B sw l r)
+  | not $ solved sw = (cxt, B sw l r)      -- found unsolved screen
   | not $ leftSolved sw = findNextScreen $ goLeft (cxt, B sw{leftSolved = True} l r)  -- look in the left and mark left solved
   | not $ rightSolved sw = findNextScreen $ goRight (cxt, B sw{rightSolved = True} l r)  -- look in the right and mark right solved
   | otherwise = findNextScreen $ goDown (cxt, B sw{solved = False, leftSolved = False, rightSolved = False} l r)
@@ -127,9 +127,10 @@ findNextScreen sp@(cxt, B sw l r)
 -- currently doesn't implement level transition
 
 nextGameState :: GameState -> GameState
+nextGameState curGs@(GameState{screenPointer = (_, Leaf)}) = gsBase
 nextGameState curGs@(GameState {currLevelInitScreen = clis, screenPointer = (c, B sw l r), titlePointer = tp}) =
     let 
-      newSp@(_, B screenInfo _ _) = findNextScreen (c, B sw{solved = True} l r)   
+      newSp@(_, B screenInfo _ _) = findNextScreen (c, B sw{solved = True, active = False, visited = True} l r)   
       isNewLvl = isNewLevel screenInfo    
       newTp = if isNewLvl then movR tp else tp    -- change title if new level
     

@@ -14,6 +14,7 @@ import LevelHelper
 import LevelData
 import Interpreter
 import Graphics
+import Zippers
 
 
   
@@ -47,9 +48,35 @@ renderRoom backgroundP sprites@(squirrelS:spikeS:boxS:acornS:_) roomState =
 -- fallback in case one of the sprites arguments wasn't passed in 
 renderRoom _ _ _ = displayErrorScreen 
 
+getTreePic :: Sprite -> Sprite -> Sprite -> BinZip ScreenWrap -> Picture
+getTreePic activePic visitedPic toVisitPic sp =
+  let 
+    spriteTree = getScreenSprite activePic visitedPic toVisitPic <$> toTree sp
+  in
+    fromSpriteTree (0, gameHeight / 2 - 40, gameWidth / 4, 50) spriteTree
+
+fromSpriteTree :: (Float, Float, Float, Float) -> BinTree Sprite -> Picture
+fromSpriteTree _ Leaf = pictures []
+fromSpriteTree (x, y, dx, dy) (B s@(Sprite{dimensions = (w, h), picture = pic}) lsub rsub) =
+  let 
+    lpic = fromSpriteTree (x - dx, y - dy, dx / 2, dy) lsub
+    rpic = fromSpriteTree (x + dx, y - dy, dx / 2, dy) rsub
+  in
+    pictures [translate x y pic, lpic, rpic]
+
+
+
+getScreenSprite :: Sprite -> Sprite -> Sprite -> ScreenWrap -> Sprite
+getScreenSprite activePic visitedPic toVisitPic sw@(ScreenWrap{active = act, visited = vis})
+  | act = activePic
+  | vis = visitedPic
+  | otherwise = toVisitPic
+
+
 
 -- display each game room at the proper position
 render :: Picture -> [Sprite] -> GameState  -> Picture
+render backgroundP sprites@(squirrelS:spikeS:boxS:acornS:_) gameState@(GameState{paused = True, screenPointer = sp}) = getTreePic squirrelS acornS spikeS sp
 render backgroundP sprites@(squirrelS:spikeS:boxS:_) gameState =
   let 
     -- rendering all of the UI elements 
@@ -132,7 +159,8 @@ update seconds gameState =
 
 handleKeys :: Event -> GameState -> GameState
 
-
+handleKeys (EventKey (SpecialKey key) Down _ _) gameState@(GameState{paused = True})
+  | key == togglePause = gameState{paused = False}
 
 -- HANDLE all special characters in one BIG boolean guard
 handleKeys (EventKey (SpecialKey key) Down _ _) gameState
@@ -141,6 +169,7 @@ handleKeys (EventKey (SpecialKey key) Down _ _) gameState
   | key == rightInput = movedGameState gameState RIGHT
   | key == upInput = movedGameState gameState UP
   | key == downInput = movedGameState gameState DOWN
+  | key == togglePause = gameState{paused = True}
 
   | key == undoInput = undoLastMove gameState
 
