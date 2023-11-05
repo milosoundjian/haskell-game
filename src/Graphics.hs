@@ -93,12 +93,14 @@ creditsScreen = res
   where 
       bg = color black $ rectangleSolid gameWidth gameHeight
 
-      txt1 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 100) $ scale 0.5 0.5 $ Text "Credits"
-      txt2 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 200) $ scale 0.5 0.5 $ Text "Rali Lahlou"
-      txt3 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 300) $ scale 0.5 0.5 $ Text "Brook Nigatu"
-      txt4 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 400) $ scale 0.5 0.5 $ Text "Milos Oundjian"
+      txt1 = color red $ translate (-633 / 2 + 20) (gameHeight / 2 - 200) $ scale 0.5 0.5 $ Text "Created by : "
+      txt2 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 300) $ scale 0.5 0.5 $ Text "- Rali Lahlou"
+      txt3 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 400) $ scale 0.5 0.5 $ Text "- Brook Nigatu"
+      txt4 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 500) $ scale 0.5 0.5 $ Text "- Milos Oundjian"
+      txt5 = color red $ translate (-633 / 2 + 20) (gameHeight / 2 - 600) $ scale 0.3 0.3 $ Text "Thank you for playing ! "
 
-      res = pictures [bg, txt1, txt2, txt3, txt4]
+
+      res = pictures [bg, txt1, txt2, txt3, txt4, txt5]
 
 pauseScreenPrompt :: Picture
 pauseScreenPrompt = Color red $ translate (-gameWidth / 2 + gameWidth / 10) (-gameHeight / 4) $ scale 0.2 0.2 $ Text "Use the Arrow keys to navigate to a previously visited puzzle"
