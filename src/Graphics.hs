@@ -88,6 +88,18 @@ textOnScreen textString textWidth textCol backCol =
     in
         pictures [bg, txt]
 
+creditsScreen :: Picture
+creditsScreen = res 
+  where 
+      bg = color black $ rectangleSolid gameWidth gameHeight
+
+      txt1 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 100) $ scale 0.5 0.5 $ Text "Credits"
+      txt2 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 200) $ scale 0.5 0.5 $ Text "Rali Lahlou"
+      txt3 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 300) $ scale 0.5 0.5 $ Text "Brook Nigatu"
+      txt4 = color white $ translate (-633 / 2 + 20) (gameHeight / 2 - 400) $ scale 0.5 0.5 $ Text "Milos Oundjian"
+
+      res = pictures [bg, txt1, txt2, txt3, txt4]
+
 gameOverScreen :: Picture
 gameOverScreen = textOnScreen "YOU DIED" 633 red (withAlpha 0.7 black)
 
@@ -99,8 +111,6 @@ displayErrorScreen = textOnScreen "Render function error" 1369 red black
 
 nullScreen :: Picture 
 nullScreen = textOnScreen "0" 70 black white
-
-
 
 -- tessellates the input sprite to form a background cover 
 getBackground :: Sprite -> Picture 
