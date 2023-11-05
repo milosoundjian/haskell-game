@@ -328,7 +328,7 @@ level4 =
 
 -- Combining everything
 levelsData:: LevelData
-levelsData = level4 --level0 ++ level1 ++ level2 ++ level3
+levelsData = level0 ++ level1 ++ level2 ++ level3 ++ level4
 
 titles :: [Title]
 titles = ["0 : Initiation", 
