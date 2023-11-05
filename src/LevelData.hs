@@ -226,6 +226,7 @@ room4A =
                       (6, 6), (7, 6), (7, 4), (7, 1), (7, 0), (8, 4), (9, 3),
                       (9, 2)],
 
+        isTerminal = True,
         specialPos = (8, 3)
     }
 
@@ -247,7 +248,8 @@ gsBase = GameState
         rooms = [],
         moveHistory = [],
 
-        isDancing = False
+        isDancing = False,
+        isCredits = False
     }
 
 

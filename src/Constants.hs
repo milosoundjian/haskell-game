@@ -33,7 +33,7 @@ resetInput = KeyCtrlL
 
 submitTextInput = KeyEnter
 clearTextInput = KeyDelete
-togglePause = KeyAltL
+togglePause = KeyTab
 
 
 

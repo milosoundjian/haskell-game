@@ -36,6 +36,7 @@ Note: Tested with Cabal 3.10.1.0
 * Arrow Keys: Move
 * Left Shift: Undo
 * Left Ctrl: Restart level
+* Tab : Pause the game
 * Esc: Close the game
 * Every other letter: Type into the game "console" (bottom)
 
@@ -46,3 +47,4 @@ Note: Tested with Cabal 3.10.1.0
 * `move to (x, y)` : teleports the squirrel to the given grid coordinates (only works if the specified tile is bereft of obstacles)
 * `dance` / `stop dancing`: make the squirrel dance (spin around)
 * `die`: kill the squirrel (game over)
+There is a small debug display in the top left of the screen that shows the lexxed version of any inputed command. 

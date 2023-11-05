@@ -139,7 +139,7 @@ findNextScreen (cxt, B sw l r)
 -- currently doesn't implement level transition
 
 nextGameState :: GameState -> GameState
-nextGameState curGs@(GameState{screenPointer = (_, Leaf)}) = gsBase
+nextGameState curGs@(GameState{screenPointer = (_, Leaf)}) = gsBase {isCredits = True}
 nextGameState curGs@(GameState {currLevelInitScreen = clis, screenPointer = (c, B sw l r)}) =
     let 
       newSp@(_, B screenInfo _ _) = findNextScreen (c, B sw{solved = True, active = False} l r)   

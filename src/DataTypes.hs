@@ -84,6 +84,7 @@ data GameState = GameState {
   moveHistory :: [GameState],
 
   --misc stuff
+  isCredits :: Bool,
   isDancing :: Bool
 }
 
