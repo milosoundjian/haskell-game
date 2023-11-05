@@ -137,6 +137,75 @@ room2C =
         specialPos = (6, 3)
     }
 
+room3A = 
+    roomBase 
+    {
+        character= (1, 1),
+        charRot = -90,
+
+        walls = [(0, 2), (0, 1), (0, 0), (1, 2), (1, 0), (2, 5), (2, 2),
+                    (2, 0), (3, 5), (3, 2), (3, 0), (4, 5), (4, 2), (4, 0),
+                    (5, 7), (5, 5), (5, 3), (5, 2), (5, 0), (6, 6), (6, 5),
+                    (6, 4), (6, 2), (6, 0), (7, 5), (7, 2), (7, 0), (8, 2),
+                    (8, 0), (9, 2), (9, 1), (9, 0)],
+
+
+        specialPos = (8, 1)
+    }
+
+room3B = 
+    roomBase 
+    {
+        character= (4, 4),
+        charRot = -90,
+
+        walls = [(3, 5), (3, 3), (5, 5), (5, 3)],
+        spikes =  [(3, 4), (4, 5), (4, 3)],
+
+        isTerminal = True,
+        specialPos = (5, 4)
+    }
+
+room3C = 
+    roomBase 
+    {
+        character= (4, 4),
+        charRot = 0,
+
+        walls = [(3, 5), (3, 2), (5, 2), (6, 5), (6, 3), (6, 2)],
+        spikes =  [(3, 4), (3, 3), (4, 5), (4, 2), (5, 5), (5, 3), (6, 4)],
+
+        isTerminal = True,
+        specialPos = (4, 3)
+    }
+
+room3D = 
+    roomBase 
+    {
+        character= (4, 4),
+        charRot = 90,
+
+        walls = [(4, 5), (4, 3), (5, 5), (5, 4), (5, 3)],
+        spikes =  [(3, 5), (3, 3)],
+
+        isTerminal = True,
+        specialPos = (3, 4)
+    }
+
+room3E = 
+    roomBase 
+    {
+        character= (4, 4),
+        charRot = 180,
+
+        walls = [(2, 6), (2, 5), (2, 4), (2, 3), (2, 2), (3, 6), (3, 2),
+                    (4, 6), (5, 6), (5, 2), (6, 6), (6, 5), (6, 3), (6, 2)],
+        spikes =  [(3, 5), (3, 4), (3, 3), (4, 2), (5, 5), (5, 3), (6, 4)],
+
+        isTerminal = True,
+        specialPos = (4, 5)
+    }
+
 --eidolon game state 
 gsBase :: GameState
 gsBase = GameState 
@@ -214,12 +283,29 @@ level2 =
         }
     ]
 
+
+level3 :: Level
+level3 = 
+    [
+        startScreen{
+            screen = [room3A]
+        },
+        midScreen {
+            screen = [room3B, room3C, room3D, room3E]
+        }
+    ]
+
 -- Combining everything
 levelsData:: LevelData
-levelsData = level0 ++ level1 ++ level2
+levelsData = level3 --level0 ++ level1 ++ level2
 
 titles :: [Title]
-titles = ["0 : Initiation", "1 : The Pursuit of Happiness", "2 : Roundabout"]
+titles = ["0 : Initiation", 
+          "1 : The Pursuit of Happiness", 
+          "2 : Roundabout",
+          "3 : 4 Player Co-op"
+          
+          ]
 
 addTitlesTL :: [Title] -> [ScreenWrap] -> [ScreenWrap]
 addTitlesTL ts = addTitles (headItem ("dummy" : ts))
