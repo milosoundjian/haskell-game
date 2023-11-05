@@ -148,7 +148,8 @@ nextGameState curGs@(GameState {currLevelInitScreen = clis, screenPointer = (c, 
     in
       initRooms curGs{
         currLevelInitScreen = if isNewLvl then newSp else clis, 
-        screenPointer = newSp
+        screenPointer = newSp,
+        isCredits = isRoot newSp
       }
 
 -- Function to navigate the game tree while game is paused. Implemented to make sure that after switching, nextGameState

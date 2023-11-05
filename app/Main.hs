@@ -142,6 +142,8 @@ update seconds gameState =
 
 handleKeys :: Event -> GameState -> GameState
 
+handleKeys (EventKey (SpecialKey key) Down _ _) gameState@(GameState{isCredits = True}) = gameState
+
 handleKeys (EventKey (SpecialKey key) Down _ _) gameState@(GameState{paused = True})
   -- allow user to navigate previously visited rooms from the pause screen
   | key == togglePause = gameState{paused = False}

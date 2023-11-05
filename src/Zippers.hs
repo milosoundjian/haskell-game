@@ -1,4 +1,5 @@
 module Zippers where
+import GHC.Base (TrName(TrNameD))
 
 -- List Zipper Implementation taken straight from the lectures with the last two methods added.
 class ListItem lp where
@@ -72,3 +73,6 @@ goDown (B0 a c t2,t) = (c,B a t t2)    -- focus on parent *from* left child
 goDown (B1 a t1 c,t) = (c,B a t1 t)    -- focus on parent *from* right child
 goDown (Hole, t) = (Hole, t)        
 
+isRoot :: BinZip a -> Bool
+isRoot (Hole, _) = True
+isRoot _ = False
