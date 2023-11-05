@@ -21,11 +21,11 @@ import PauseScreen
 
 -- display the user character + the current text input
 renderRoom :: Picture -> [Sprite] -> RoomState -> Picture
-renderRoom backgroundP sprites@(squirrelS:spikeS:boxS:acornS:_) roomState = 
+renderRoom backgroundP sprites@(squirrelS:spikeS:boxS:acornS:branchS:_) roomState = 
   let 
     --display the player
     rotation = charRot roomState
-    player = spriteCell (character roomState) rotation (squirrelS)
+    player = spriteCell (character roomState) rotation squirrelS
 
     -- display the grid entities
     renderBoxes pos = spriteCell pos 0 boxS
@@ -38,7 +38,7 @@ renderRoom backgroundP sprites@(squirrelS:spikeS:boxS:acornS:_) roomState =
     -- TODO : replace the solid blocks with real assets
     specialDraw = if (isTerminal roomState) 
                     then (\x -> spriteCell x 0 acornS)
-                    else (`fillCell` orange)
+                    else (\x -> spriteCell x 0 branchS)
     specialP = specialDraw $ specialPos roomState
 
   in
@@ -190,6 +190,7 @@ main = do
   spike <- loadBMP "assets/spike.bmp"
   box <- loadBMP "assets/box.bmp"
   acorn <- loadBMP "assets/acorn.bmp"
+  branch <- loadBMP "assets/branch_glitched.bmp"
   
   let grassS = Sprite  {picture = grass, dimensions = (32,32)} --only used rn for the background
 
@@ -197,8 +198,9 @@ main = do
   let spikeS = Sprite {picture = spike, dimensions = (32, 32)}
   let boxS = Sprite {picture = box, dimensions = (32, 32)}
   let acornS = Sprite {picture = acorn, dimensions = (32, 32)}
+  let branchS = Sprite {picture = branch, dimensions = (32, 32)}
 
-  let sprites = [squirrelS, spikeS, boxS, acornS]
+  let sprites = [squirrelS, spikeS, boxS, acornS, branchS]
                 
 
   -- generate the background once, for all future uses
@@ -215,7 +217,6 @@ main = do
 
   -- load the first level in list 
   -- let firstLevel = (fst $ head levelsData) {rooms = head $ snd $ head levelsData} 
-  
   let initialState = initRooms gsBase
 
   --load the first level in list

@@ -109,6 +109,6 @@ interpret input gs =
             [W "die"] ->
                     (backup gs) {gameOver = True}
 
-            _ -> gs {debugText = "Command not recognized: " ++ (show $ mergePass. wordPass. preprocess $ input)}
+            _ -> gs {debugText = "Command not recognized: " ++ (show command)}
 
 
