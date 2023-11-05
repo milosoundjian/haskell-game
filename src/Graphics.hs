@@ -100,6 +100,9 @@ creditsScreen = res
 
       res = pictures [bg, txt1, txt2, txt3, txt4]
 
+pauseScreenPrompt :: Picture
+pauseScreenPrompt = Color red $ translate (-gameWidth / 2 + gameWidth / 10) (-gameHeight / 4) $ scale 0.2 0.2 $ Text "Use the Arrow keys to navigate to a previously visited puzzle"
+
 gameOverScreen :: Picture
 gameOverScreen = textOnScreen "YOU DIED" 633 red (withAlpha 0.7 black)
 

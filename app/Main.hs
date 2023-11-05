@@ -58,7 +58,11 @@ renderRoom _ _ _ = displayErrorScreen
 
 -- display each game room at the proper position
 render :: Picture -> [Sprite] -> GameState  -> Picture
-render backgroundP sprites@(squirrelS:spikeS:boxS:acornS:_) gameState@(GameState{paused = True, screenPointer = sp}) = getTreePic squirrelS acornS spikeS sp
+render backgroundP sprites@(squirrelS:spikeS:boxS:acornS:_) gameState@(GameState{paused = True, screenPointer = sp}) = 
+  let 
+    tpic = getTreePic squirrelS acornS spikeS sp
+  in
+    pictures [tpic, pauseScreenPrompt]
 render backgroundP sprites (GameState{isCredits = True}) = creditsScreen
 render backgroundP sprites gameState =
   let 
