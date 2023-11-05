@@ -4,6 +4,8 @@ Enjoy the trials and tribulations of life as a squirrel in Haskell.
 
 A game written in Haskell using the [Gloss](https://hackage.haskell.org/package/gloss) library.
 
+Project hosted at : https://github.com/milosoundjian/haskell-game 
+
 ## Installation
 
 Either stack or cabal is required to turn the project into an executable format.
