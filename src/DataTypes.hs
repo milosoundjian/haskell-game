@@ -48,8 +48,10 @@ data Direction = UP | DOWN | LEFT | RIGHT deriving (Eq, Ord, Enum)
 
 data RoomState = RoomState
   {
+      --character related stuff
       character :: Character,
-      charRot :: Float, -- character rotation
+      charRot :: Float, 
+      isDoubleSpeed :: Bool, --whether squirrel moves 2 tiles at once
 
       walls :: [Position],
       spikes :: [Position],

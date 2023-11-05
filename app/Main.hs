@@ -21,11 +21,17 @@ import PauseScreen
 
 -- display the user character + the current text input
 renderRoom :: Picture -> [Sprite] -> RoomState -> Picture
-renderRoom backgroundP sprites@(squirrelS:spikeS:boxS:acornS:branchS:_) roomState = 
+renderRoom backgroundP 
+           sprites@(squirrelS:spikeS:boxS:acornS:branchS:sonicS:_) 
+           roomState = 
   let 
     --display the player
     rotation = charRot roomState
-    player = spriteCell (character roomState) rotation squirrelS
+    playerSprite = if (isDoubleSpeed roomState)  
+                      then sonicS
+                      else squirrelS 
+
+    player = spriteCell (character roomState) rotation playerSprite
 
     -- display the grid entities
     renderBoxes pos = spriteCell pos 0 boxS
@@ -187,6 +193,7 @@ main = do
   -- load the assets for the render function
   grass <- loadBMP "assets/grass.bmp"
   squirrel <- loadBMP "assets/squirrel.bmp"
+  sonic <- loadBMP "assets/sonic.bmp"
   spike <- loadBMP "assets/spike.bmp"
   box <- loadBMP "assets/box.bmp"
   acorn <- loadBMP "assets/acorn.bmp"
@@ -195,12 +202,13 @@ main = do
   let grassS = Sprite  {picture = grass, dimensions = (32,32)} --only used rn for the background
 
   let squirrelS = Sprite  {picture = squirrel, dimensions = (32,32)}
+  let sonicS = Sprite {picture = sonic, dimensions= (32, 32)}
   let spikeS = Sprite {picture = spike, dimensions = (32, 32)}
   let boxS = Sprite {picture = box, dimensions = (32, 32)}
   let acornS = Sprite {picture = acorn, dimensions = (32, 32)}
   let branchS = Sprite {picture = branch, dimensions = (32, 32)}
 
-  let sprites = [squirrelS, spikeS, boxS, acornS, branchS]
+  let sprites = [squirrelS, spikeS, boxS, acornS, branchS, sonicS]
                 
 
   -- generate the background once, for all future uses

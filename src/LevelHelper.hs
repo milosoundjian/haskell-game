@@ -41,7 +41,20 @@ movedToRoomState rs (x,y)
     else 
       rs
 
+
+
 movedRoomState ::  RoomState  -> Direction -> RoomState
+
+--special case where the squirrel is double speed
+movedRoomState rs@(RoomState {isDoubleSpeed = True}) dir =
+  let 
+    --apply regular move twice
+    movedState =  (iterate (`movedRoomState` dir) (rs {isDoubleSpeed = False}) !! 2 )
+                    {isDoubleSpeed = True}
+  in
+    movedState
+
+
 movedRoomState rs  dir
   | (rGameOver rs) = rs -- don't do anything if room is game overed
   | otherwise = 

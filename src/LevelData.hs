@@ -12,6 +12,7 @@ roomBase =
     {
         character = (-100, -100),
         charRot = 180,
+        isDoubleSpeed = False,
 
         walls = [],
         spikes = [],
@@ -108,10 +109,10 @@ room2B =
 
         walls = [(0, 6), (1, 6), (1, 5), (1, 4), (1, 3), (1, 2), (1, 1),
                     (2, 7), (2, 3), (3, 7), (3, 3), (3, 2), (3, 1), (4, 7),
-                    (4, 1), (5, 0), (6, 6), (6, 3), (6, 0), (7, 0), (8, 5),
+                    (4, 1), (5, 0), (6, 6),  (6, 0), (7, 0), (8, 5),
                     (9, 4), (9, 3), (9, 0)],
         spikes = [(0, 2), (0, 0), (1, 0), (2, 6), (2, 4), (2, 2), (2, 0),
-                      (4, 2), (5, 1), (6, 7), (7, 5), (7, 1), (8, 0), (9, 2),
+                      (4, 2), (5, 1), (6, 3), (6, 7), (7, 5), (7, 1), (8, 0), (9, 2),
                       (9, 1), (5, 4), (4, 5)],
         isTerminal = True,
         specialPos = (7, 4)
@@ -206,6 +207,28 @@ room3E =
         specialPos = (4, 5)
     }
 
+room4A = 
+    roomBase 
+    {
+        character= (1, 3),
+        charRot = -90,
+        isDoubleSpeed = True ,
+
+        walls = [(0, 7), (0, 6), (0, 5), (0, 4), (0, 3), (0, 2), (0, 1),
+                    (0, 0), (1, 7), (1, 6), (1, 5), (1, 4), (1, 0), (2, 7),
+                    (2, 6), (2, 5), (2, 1), (2, 0), (3, 7), (3, 6), (3, 5),
+                    (3, 1), (3, 0), (4, 7), (4, 5), (4, 1), (5, 7), (5, 0),
+                    (6, 7), (6, 0), (7, 7), (7, 5), (8, 7), (8, 6), (8, 5),
+                    (8, 1), (8, 0), (9, 7), (9, 6), (9, 5), (9, 4), (9, 1),
+                    (9, 0)],
+
+        spikes = [(1, 1), (2, 4), (3, 4), (4, 6), (4, 4), (4, 0), (5, 6),
+                      (6, 6), (7, 6), (7, 4), (7, 1), (7, 0), (8, 4), (9, 3),
+                      (9, 2)],
+
+        specialPos = (8, 3)
+    }
+
 --eidolon game state 
 gsBase :: GameState
 gsBase = GameState 
@@ -295,15 +318,24 @@ level3 =
         }
     ]
 
+level4 :: Level
+level4 = 
+    [
+        startScreen {
+            screen = [room4A]
+        }
+    ]
+
 -- Combining everything
 levelsData:: LevelData
-levelsData = level3 --level0 ++ level1 ++ level2
+levelsData = level4 --level0 ++ level1 ++ level2 ++ level3
 
 titles :: [Title]
 titles = ["0 : Initiation", 
           "1 : The Pursuit of Happiness", 
           "2 : Roundabout",
-          "3 : 4 Player Co-op"
+          "3 : 4 Player Co-op",
+          "4 : Supersonic Sciurine"
           
           ]
 
